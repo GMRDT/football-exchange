@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+out/
+dist/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Supabase local
+supabase/.branches
+supabase/.temp
+supabase/functions/.cache
+
+# Secrets (extra safety net)
+*.key
+*.pem
+service_role*
+api_key*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+*.swp
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
