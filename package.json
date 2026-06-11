@@ -17,8 +17,10 @@
   },
   "dependencies": {
     "@serwist/next": "^9",
+    "@supabase/supabase-js": "^2.108.1",
     "next": "^15",
     "next-intl": "^3",
+    "papaparse": "^5.5.3",
     "react": "^19",
     "react-dom": "^19",
     "serwist": "^9",
@@ -35,9 +37,12 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^4",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "^15",
     "eslint-plugin-react-hooks": "^7.1.1",
@@ -45,6 +50,7 @@
     "tailwindcss": "^4",
     "tsx": "^4",
     "typescript": "^5",
-    "vitest": "^2"
+    "vitest": "^2",
+    "ws": "^8.21.0"
   }
 }
