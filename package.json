@@ -1,0 +1,50 @@
+{
+  "name": "football-exchange",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.config.integration.ts",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > src/lib/supabase/types.ts",
+    "seed": "tsx scripts/seed.ts",
+    "check-invariants": "tsx scripts/check-invariants.ts",
+    "record-fixture": "tsx scripts/record-fixture.ts"
+  },
+  "dependencies": {
+    "@serwist/next": "^9",
+    "next": "^15",
+    "next-intl": "^3",
+    "react": "^19",
+    "react-dom": "^19",
+    "serwist": "^9",
+    "zod": "^3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "^15",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3",
+    "tailwindcss": "^4",
+    "tsx": "^4",
+    "typescript": "^5",
+    "vitest": "^2"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "common": {
+    "appName": "Football Exchange",
+    "tagline": "Trade the World Cup. Build your portfolio.",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "nav": {
+    "market": "Market",
+    "portfolio": "Portfolio",
+    "leaderboard": "Leaderboard"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "continueWithGoogle": "Continue with Google"
+  },
+  "market": {
+    "title": "Market",
+    "search": "Search players...",
+    "topGainers": "Top Gainers",
+    "topLosers": "Top Losers",
+    "buy": "Buy",
+    "sell": "Sell",
+    "shares": "Shares",
+    "price": "Price",
+    "fairValue": "Fair Value",
+    "dailyChange": "Daily Change"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "holdings": "Positions",
+    "cash": "Cash",
+    "totalValue": "Total Value",
+    "return": "Return (%)",
+    "share": "Share"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "return": "Return (%)",
+    "privateLeague": "Private League",
+    "inviteCode": "Invite Code",
+    "joinLeague": "Join League",
+    "createLeague": "Create League"
+  },
+  "feed": {
+    "title": "Activity",
+    "yourPlayers": "Your Players"
+  },
+  "errors": {
+    "insufficientFunds": "Insufficient funds",
+    "insufficientShares": "Insufficient shares",
+    "positionCap": "Position cap reached",
+    "volumeCap": "Daily volume cap reached",
+    "rateLimited": "Too many trades, please wait",
+    "invalidInput": "Invalid input",
+    "playerNotFound": "Player not found"
+  }
+}

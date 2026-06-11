@@ -1,0 +1,66 @@
+{
+  "common": {
+    "appName": "Football Exchange",
+    "tagline": "Tradea el Mundial. Construye tu portafolio.",
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar"
+  },
+  "nav": {
+    "market": "Mercado",
+    "portfolio": "Portafolio",
+    "leaderboard": "Clasificación"
+  },
+  "auth": {
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "signUp": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "continueWithGoogle": "Continuar con Google"
+  },
+  "market": {
+    "title": "Mercado",
+    "search": "Buscar jugadores...",
+    "topGainers": "Mayores subidas",
+    "topLosers": "Mayores caídas",
+    "buy": "Comprar",
+    "sell": "Vender",
+    "shares": "Acciones",
+    "price": "Precio",
+    "fairValue": "Valor justo",
+    "dailyChange": "Cambio del día"
+  },
+  "portfolio": {
+    "title": "Portafolio",
+    "holdings": "Posiciones",
+    "cash": "Efectivo",
+    "totalValue": "Valor total",
+    "return": "Retorno (%)",
+    "share": "Compartir"
+  },
+  "leaderboard": {
+    "title": "Clasificación",
+    "rank": "Posición",
+    "return": "Retorno (%)",
+    "privateLeague": "Liga privada",
+    "inviteCode": "Código de invitación",
+    "joinLeague": "Unirse a liga",
+    "createLeague": "Crear liga"
+  },
+  "feed": {
+    "title": "Actividad",
+    "yourPlayers": "Tus jugadores"
+  },
+  "errors": {
+    "insufficientFunds": "Fondos insuficientes",
+    "insufficientShares": "Acciones insuficientes",
+    "positionCap": "Límite de posición alcanzado",
+    "volumeCap": "Límite de volumen diario alcanzado",
+    "rateLimited": "Demasiadas operaciones, por favor espera",
+    "invalidInput": "Entrada no válida",
+    "playerNotFound": "Jugador no encontrado"
+  }
+}
