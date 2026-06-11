@@ -50,23 +50,23 @@ Goal: working repo, tooling, CI, and 6 docs. Nothing else.
 
 Goal: complete normalized schema, RLS on everything, 200 players seeded with real values.
 
-- [ ] **F1.1** Complete schema migrations (Prompt 1 → Claude Code, plan mode)
-  - [ ] Catalog tables: `teams`, `rounds`, `event_types`, `positions`
-  - [ ] Core tables: `profiles` (with registration trigger + `locale` column en|es), `players`, `matches`
-  - [ ] Event tables: `match_events` (with `api_event_key` UNIQUE), `player_match_appearances`, `player_injuries`
-  - [ ] Price tables: `price_history`, `pending_price_deltas`
-  - [ ] Trading tables: `wallet_ledger` (append-only), `trades`, `holdings`
-  - [ ] Social tables: `leagues`, `league_members`
-  - [ ] Config table: `market_params` (single row, jsonb params per MARKET_ENGINE.md §6)
-  - [ ] Views: `v_player_stats`, `v_portfolio_value`, `v_leaderboard` (materialized)
-  - [ ] Registration trigger: creates profile + inserts 100_000 signup entry in ledger
+- [x] **F1.1** Complete schema migrations (Prompt 1 → Claude Code, plan mode)
+  - [x] Catalog tables: `teams`, `rounds`, `event_types`, `positions`
+  - [x] Core tables: `profiles` (with registration trigger + `locale` column en|es), `players`, `matches`
+  - [x] Event tables: `match_events` (with `api_event_key` UNIQUE), `player_match_appearances`, `player_injuries`
+  - [x] Price tables: `price_history`, `pending_price_deltas`
+  - [x] Trading tables: `wallet_ledger` (append-only), `trades`, `holdings`
+  - [x] Social tables: `leagues`, `league_members`
+  - [x] Config table: `market_params` (single row, jsonb params per MARKET_ENGINE.md §6)
+  - [x] Views: `v_player_stats`, `v_portfolio_value`, `v_leaderboard` (materialized)
+  - [x] Registration trigger: creates profile + inserts 100_000 signup entry in ledger
 
-- [ ] **F1.2** RLS policies
-  - [ ] All tables have RLS enabled
-  - [ ] Public read: `players`, `teams`, `matches`, `match_events`, `price_history`, leaderboard
-  - [ ] Owner read: `profiles`, `holdings`, `trades`, `wallet_ledger`
-  - [ ] Zero direct client writes on financial/pricing tables
-  - [ ] Test: `anon` role can SELECT players but cannot INSERT to any financial table
+- [x] **F1.2** RLS policies
+  - [x] All tables have RLS enabled
+  - [x] Public read: `players`, `teams`, `matches`, `match_events`, `price_history`, leaderboard
+  - [x] Owner read: `profiles`, `holdings`, `trades`, `wallet_ledger`
+  - [x] Zero direct client writes on financial/pricing tables
+  - [x] Test: `anon` role can SELECT players but cannot INSERT to any financial table
 
 - [ ] **F1.3** TypeScript types generated
   - [ ] `supabase gen types typescript` → `src/lib/supabase/types.ts`
@@ -81,7 +81,7 @@ Goal: complete normalized schema, RLS on everything, 200 players seeded with rea
   - [ ] `pnpm seed` runs twice with identical result (no duplicates)
 
 - [ ] **F1.5** Local validation
-  - [ ] `supabase db reset` clean
+  - [x] `supabase db reset` clean
   - [ ] `supabase link` + `supabase db push` to remote project
   - [ ] `pnpm seed` populates ~200 players
   - [ ] Seed count report: 48 teams, ~200 players, 1 market_params row
