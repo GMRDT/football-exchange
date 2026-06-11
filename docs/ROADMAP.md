@@ -101,32 +101,34 @@ Goal: complete normalized schema, RLS on everything, 200 players seeded with rea
 Goal: atomic trade function with full invariant guarantees.
 **Nothing in F3/F4 starts until F2 tests are green.**
 
-- [ ] **F2.1** `trade()` Postgres RPC (Prompt 3 → Claude Code, plan mode, read plan before approving)
-  - [ ] Full sequence per ARCHITECTURE.md §RPC contracts
-  - [ ] Spread logic: reads from `market_params`, higher spread when player in live match
-  - [ ] Position cap: 20% of 100_000
-  - [ ] Daily volume cap
-  - [ ] Rate limit: N trades per 60s (in-DB check)
-  - [ ] All typed error codes returned as jsonb
-  - [ ] Migration file created and tested locally
+- [x] **F2.1** `trade()` Postgres RPC (Prompt 3 → Claude Code, plan mode, read plan before approving)
+  - [x] Full sequence per ARCHITECTURE.md §RPC contracts
+  - [x] Spread logic: reads from `market_params`, higher spread when player in live match
+  - [x] Position cap: 20% of 100_000
+  - [x] Daily volume cap
+  - [x] Rate limit: N trades per 60s (in-DB check)
+  - [x] All typed error codes returned as jsonb
+  - [x] Migration file created and tested locally
 
-- [ ] **F2.2** Integration tests (Vitest + Supabase local)
-  - [ ] Happy path: buy
-  - [ ] Happy path: sell
-  - [ ] Insufficient funds
-  - [ ] Insufficient shares
-  - [ ] Position cap hit
-  - [ ] Volume cap hit
-  - [ ] Rate limit hit
-  - [ ] **Concurrent trades:** `Promise.all([trade, trade])` on same player — verify no double-spend
-  - [ ] All tests pass: `pnpm test:integration`
+- [x] **F2.2** Integration tests (Vitest + Supabase local)
+  - [x] Happy path: buy
+  - [x] Happy path: sell
+  - [x] Insufficient funds
+  - [x] Insufficient shares
+  - [x] Position cap hit
+  - [x] Volume cap hit
+  - [x] Rate limit hit
+  - [x] **Concurrent trades:** `Promise.all([trade, trade])` on same player — verify no double-spend
+  - [x] All tests pass: `pnpm test:integration`
 
 - [ ] **F2.3** Invariant checker
-  - [ ] `scripts/check-invariants.ts` implemented:
+  - [x] `scripts/check-invariants.ts` implemented:
     - `SUM(wallet_ledger.delta) == profiles.cash_balance` for every user
     - `holdings.shares >= 0` for all rows
-    - `players.current_price > 0` for all players
-  - [ ] Script runs clean on seeded data
+    - `players.current_price >= min_price` for all players
+    - Latest ledger entry per user: `balance_after == cash_balance`
+    - `SUM(holdings.shares)` per player `== players.shares_outstanding` (drift)
+  - [x] Script runs clean on seeded data
   - [ ] Daily cron job in prod (pg_cron calling Edge Function or a simple SELECT check)
 
 ---

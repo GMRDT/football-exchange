@@ -165,6 +165,30 @@ A player is "in live match" if there exists a row in `matches` where:
 - `status IN ('1H', '2H', 'ET', 'P')` (API-Football status codes for live match)
 - `kickoff_utc <= now() AND kickoff_utc >= now() - interval '3 hours'`
 
+### 3.4 Exact accounting (as implemented in `trade()`)
+All amounts are computed at 6 decimal places (`NUMERIC(20,6)`); `p_shares` is
+normalized with `round(p_shares, 6)` BEFORE any arithmetic. Every intermediate
+amount is rounded to 6 dp before use:
+
+```
+P_mid      = players.current_price                     (the mid price)
+exec_price = round(P_mid × (1 + spread/2), 6)   (buy)
+           = round(P_mid × (1 - spread/2), 6)   (sell)
+gross      = round(shares × P_mid, 6)
+fee        = round(shares × P_mid × spread/2, 6)
+net        = gross + fee    (buy  → debited from cash_balance)
+           = gross - fee    (sell → credited to cash_balance)
+```
+
+- `trades.price_per_share` stores `exec_price`; `gross`, `fee`, `net` are stored
+  per trade.
+- `wallet_ledger.delta` is `-net` (buy) / `+net` (sell), with `balance_after`
+  maintained inside the same transaction.
+- **The fee is a sink**: it is debited from the buyer (or withheld from the
+  seller) and credited to NO account. This is the economy's only drain.
+- Buy cost basis includes the fee: `new_avg = (old_shares × old_avg + net) /
+  (old_shares + shares)`. Sells leave `avg_cost` untouched.
+
 ---
 
 ## 4. Circuit breakers (hard limits)
@@ -207,6 +231,8 @@ Live in `market_params.position_limits` (jsonb).
   "spread_base": 0.01,
   "spread_live": 0.025,
   "drip_minutes": 3,
+  "trading_enabled": true,
+  "rate_limit_trades_per_min": 10,
   "circuit_breakers": {
     "max_event_pct": 0.25,
     "max_daily_pct": 0.50,

@@ -88,28 +88,41 @@ Atomic Postgres function, `SECURITY DEFINER`, fixed `search_path`.
 ```typescript
 {
   ok: false,
-  code: 'insufficient_funds' | 'insufficient_shares' | 'position_cap' |
-        'volume_cap' | 'rate_limited' | 'invalid_input' | 'player_not_found',
+  code: 'unauthorized' | 'invalid_input' | 'trading_paused' | 'player_not_found' |
+        'rate_limited' | 'insufficient_funds' | 'insufficient_shares' |
+        'position_cap' | 'volume_cap',
   message: string
 }
 ```
 
-**Execution sequence (must be in this order):**
-1. `auth.uid()` required
-2. Validate inputs (side, shares > 0, shares ≤ max_order_size from market_params)
-3. `SELECT ... FOR UPDATE` on player row AND profile row (prevents race conditions)
-4. Rate-limit check: count trades in last 60s from `trades` table
-5. Compute execution price (spread logic, see MARKET_ENGINE.md §3)
-6. Validate: sufficient funds (buy) or sufficient shares (sell)
-7. Validate: position cap (buy only) — accumulated cost ≤ position_cap_pct × 100_000
-8. Validate: daily volume cap for this user × this player
-9. Write `trades` (INSERT)
-10. Write `holdings` (UPSERT, compute new avg_cost on buy)
-11. Write `wallet_ledger` (INSERT, with running balance_after)
-12. Write `profiles.cash_balance` (UPDATE)
-13. Write `players` (UPDATE current_price, shares_outstanding)
-14. Write `price_history` (INSERT, reason = 'trade')
-15. Return success jsonb
+Errors are returned as jsonb (not raised): by the time any error can be
+returned, the function has written NOTHING, so committing is harmless.
+`EXECUTE` is revoked from `anon` — unauthenticated callers get a PostgREST
+permission error (42501) without reaching the function body.
+
+**Execution sequence (must be in this order — zero writes before step 12):**
+1. `auth.uid()` required → `unauthorized`
+2. `p_shares := round(p_shares, 6)` — normalize BEFORE any arithmetic
+3. Validate inputs (side ∈ buy|sell, shares > 0, shares ≤ max_order_size) → `invalid_input`
+4. Read `market_params` once; fail-closed gate on `trading_enabled` → `trading_paused`
+5. `SELECT ... FOR UPDATE` on profile row — ALWAYS profile first (fixed lock
+   order profile → player prevents deadlocks) → `unauthorized` if missing
+6. `SELECT ... FOR UPDATE` on player row → `player_not_found`
+7. Rate-limit check under the lock: count trades in last 60s → `rate_limited`
+8. Spread: live-match detection (MARKET_ENGINE.md §3.3) → spread_live | spread_base
+9. Compute exec_price / gross / fee / net (MARKET_ENGINE.md §3.4, all 6 dp)
+10. Business validations (ALL before any write):
+    sufficient funds (buy) → `insufficient_funds`; sufficient shares (sell) →
+    `insufficient_shares`; cost-basis cap (buy) → `position_cap`; daily UTC
+    volume per user × player → `volume_cap`
+11. Price impact `delta = (shares / L_tier) × k_d_tier`, then clamps in order:
+    daily breaker (±max_daily_pct vs price 24h ago, fallback base_value) →
+    min_price floor → base_value × max_price_multiplier cap
+12. Writes (single transaction): `trades` INSERT → `holdings` UPSERT (new
+    avg_cost on buy; avg_cost intact on sell) → `wallet_ledger` INSERT with
+    `balance_after` → `profiles.cash_balance` UPDATE → `players` UPDATE
+    (current_price, shares_outstanding) → `price_history` INSERT (reason='trade')
+13. Return success jsonb — all NUMERIC values serialized as strings
 
 ---
 

@@ -784,7 +784,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      trade: {
+        Args: { p_player_id: string; p_shares: number; p_side: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
