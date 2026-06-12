@@ -7,8 +7,9 @@
  * Checks via the service-role-only check_cron_health() RPC:
  *   1. Vault secrets 'project_url' and 'service_role_key' exist
  *      (presence booleans only — values never leave the database)
- *   2. cron jobs invoke-ingest / invoke-tick / refresh-leaderboard scheduled
- *      and active, with their last run status (informational)
+ *   2. cron jobs invoke-ingest / invoke-tick / refresh-leaderboard /
+ *      invoke-sync-fixtures scheduled and active, with their last run status
+ *      (informational)
  *
  * Exit 0 when everything is in place; exit 1 with a per-item report otherwise.
  * Without this, a missing Vault secret fails SILENTLY (the cron job logs a
@@ -50,7 +51,12 @@ type CronHealth = {
   }[]
 }
 
-const EXPECTED_JOBS = ['invoke-ingest', 'invoke-tick', 'refresh-leaderboard'] as const
+const EXPECTED_JOBS = [
+  'invoke-ingest',
+  'invoke-tick',
+  'refresh-leaderboard',
+  'invoke-sync-fixtures',
+] as const
 
 async function main() {
   const { data, error } = await supabase.rpc('check_cron_health')
@@ -82,8 +88,8 @@ async function main() {
     if (!job) {
       console.log(`  ✗ ${name} (not scheduled)`)
       problems.push(
-        `cron job '${name}' not scheduled — migration 20260611000003_price_engine.sql ` +
-          'has not been applied here'
+        `cron job '${name}' not scheduled — its scheduling migration ` +
+          '(price_engine / fixture_sync) has not been applied here'
       )
       continue
     }

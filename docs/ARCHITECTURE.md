@@ -15,6 +15,12 @@ The 70% of risk lives in systems 1–3. The frontend is commodity.
 
 ```
 API-Football
+  │  full fixture list, 1 request every 6h
+  ▼
+Edge Function: sync-fixtures  ◄── pg_cron (every 6h)
+  └─ upserts matches via sync_fixture() (new fixtures, kickoff/status changes)
+
+API-Football
   │  poll every 30–60s (match days only)
   ▼
 Edge Function: ingest
@@ -51,6 +57,7 @@ PWA (Next.js)
 | `trade()` RPC | Price impact from trades, ledger writes, balance updates | Fair value computation, mean reversion |
 | `ingest` Edge Fn | Event ingestion, idempotency, fair_value updates, delta queuing | Price drip, leaderboard |
 | `tick` Edge Fn | Price drip, mean reversion, leaderboard refresh | Event ingestion, trade execution |
+| `sync-fixtures` Edge Fn | Keeping `matches` in sync with the API fixture list | Events, prices, anything financial |
 | `_shared/market.ts` | Pure math: all formulas | Any I/O, DB access |
 | Next.js client | Display, user input | Any financial writes |
 
@@ -123,6 +130,13 @@ permission error (42501) without reaching the function body.
     `balance_after` → `profiles.cash_balance` UPDATE → `players` UPDATE
     (current_price, shares_outstanding) → `price_history` INSERT (reason='trade')
 13. Return success jsonb — all NUMERIC values serialized as strings
+
+### `sync_fixture(p_api_fixture_id, p_home_api_team_id, p_away_api_team_id, p_kickoff, p_status, p_round_sort_order) → jsonb`
+Service-role only (`EXECUTE` revoked from anon/authenticated). Idempotent upsert
+keyed on `matches.api_fixture_id`; called once per fixture by the `sync-fixtures`
+Edge Function. Returns `{action: 'inserted' | 'updated' | 'unchanged' | 'skipped',
+reason?}` — unresolved `api_team_id`/`sort_order` mappings are `'skipped'`, not
+errors, and `processed = true` matches are never modified (ADR-009).
 
 ---
 
@@ -211,6 +225,18 @@ component (the classic expensive rewrite).
 | Invite code | Código de invitación |
 | Activity | Actividad |
 
+**ADR-009: Automatic fixture sync**
+`matches` rows must exist before `ingest` can poll them, and manual seeding does not
+survive kickoff changes or bracket progression. The `sync-fixtures` Edge Function
+(pg_cron, every 6h) fetches the full tournament fixture list — one API request — and
+upserts each row through the service-role-only `sync_fixture()` RPC, keyed on
+`matches.api_fixture_id`. API-Football short status codes are the canonical
+`matches.status` values (no translation layer). Teams resolve via `teams.api_team_id`
+and rounds via `rounds.sort_order`; unresolved mappings are skipped, not errors —
+knockout fixtures carry TBD teams until the bracket settles, and the next run picks
+them up. `processed = true` matches are immutable to the sync, so a stale poll can
+never regress a finalized match.
+
 ---
 
 ## External API: API-Football
@@ -225,7 +251,8 @@ Endpoints used:
 **Known gotchas:**
 - Missing coverage → empty array with HTTP 200 (not a 404). Always check array length.
 - `player.id` can be null for unnamed players in events.
-- Rate limit: ~100 req/day (free tier). MVP needs paid tier from ~Jun 16.
+- Rate limit: 7,500 req/day (Pro plan). Budget: 1 req per sync-fixtures run (6h)
+  + 1 req per started unprocessed fixture per ingest poll (1 min on match days).
 - Poll result: same events re-returned every poll → idempotency is mandatory.
 
 ---
@@ -258,6 +285,6 @@ GitHub main
   └─► Supabase (manual: supabase db push before merging schema changes)
         ├─ Postgres (all tables, RLS, RPCs)
         ├─ Auth (email + Google OAuth + Turnstile)
-        ├─ Edge Functions (ingest, tick)
+        ├─ Edge Functions (ingest, tick, sync-fixtures)
         └─ pg_cron (scheduled jobs → Edge Functions via pg_net)
 ```

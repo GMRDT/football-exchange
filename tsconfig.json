@@ -24,6 +24,7 @@
     "node_modules",
     "src/sw.ts",
     "supabase/functions/ingest",
-    "supabase/functions/tick"
+    "supabase/functions/tick",
+    "supabase/functions/sync-fixtures"
   ]
 }

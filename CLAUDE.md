@@ -31,6 +31,7 @@ pnpm check-invariants             # npx tsx scripts/check-invariants.ts
 pnpm check-prod-secrets           # npx tsx scripts/check-prod-secrets.ts (Vault + cron health)
 pnpm map-api-players [--top N]    # npx tsx scripts/map-api-players.ts (populate api_player_id)
 pnpm record-fixture [fixture_id]  # npx tsx scripts/record-fixtures.ts
+pnpm trigger-fn [name]            # npx tsx scripts/trigger-edge-function.ts (run ingest|tick|sync-fixtures on demand)
 ```
 
 ## Conventions

@@ -199,7 +199,12 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
         idempotent DB write for unambiguous matches, review CSV for the rest
   - [ ] Run `pnpm map-api-players` against the live API (needs API budget) + review CSV
         — at minimum the top 20 by base_value before F3.5
-  - [ ] Map `teams.api_team_id` + seed `matches` fixtures (prerequisite for ingest)
+  - [x] Map `teams.api_team_id` (54/54 mapped via squad fetch)
+  - [x] `matches` seeding automated: `sync-fixtures` Edge Function + `invoke-sync-fixtures`
+        pg_cron job (every 6h) upsert the full fixture list by `api_fixture_id` — new
+        fixtures, kickoff changes, status updates, TBD knockout slots picked up once the
+        bracket settles (ADR-009). Deploy + first live run remain human-gated
+        (`pnpm trigger-fn sync-fixtures`)
   - [ ] Group-exit elimination detection (cross-group best-third standings; knockout
         advancement/elimination is already automatic — launch Jun 28 is Round of 16)
   - [ ] Lineup-based FT events (`clean_sheet_gk/def`, `motm`, `injury_out`) — needs
