@@ -73,6 +73,17 @@
     "signupCtaBody": "Create your free account and get 100,000 FX Coins to build your portfolio.",
     "signupCtaButton": "Sign up free"
   },
+  "landing": {
+    "headline": "The World Cup 2026 player market",
+    "tagline": "Buy and sell the stars with 100,000 fully virtual coins. Prices move with the matches in real time.",
+    "startFree": "Start free",
+    "seeMarket": "See the market",
+    "topMovers": "Top movers now",
+    "howItWorks": "How it works",
+    "step1": "Get 100,000 FX Coins — free and fully virtual",
+    "step2": "Buy and sell players as the matches move their prices",
+    "step3": "Climb the leaderboard"
+  },
   "positions": {
     "GK": "GK",
     "DEF": "DEF",

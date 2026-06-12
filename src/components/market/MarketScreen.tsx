@@ -8,15 +8,9 @@ import { KitAvatar } from '@/components/ui/KitAvatar'
 import { PriceChange } from '@/components/ui/PriceChange'
 import { PlayerRow } from '@/components/market/PlayerRow'
 import { marketKey } from '@/lib/swr/keys'
-import { marketResponseSchema, type MarketPlayer, type MarketResponse } from '@/lib/market/summary'
+import { fetchMarket, type MarketPlayer } from '@/lib/market/summary'
 
 type SortMode = 'change' | 'price'
-
-async function fetchMarket(url: string): Promise<MarketResponse> {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`market fetch failed: ${res.status}`)
-  return marketResponseSchema.parse(await res.json())
-}
 
 export function MarketScreen({ initialPlayers }: { initialPlayers: MarketPlayer[] }) {
   const t = useTranslations('market')

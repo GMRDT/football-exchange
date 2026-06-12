@@ -42,6 +42,13 @@ export const marketResponseSchema = z.object({
 export type MarketPlayer = z.infer<typeof marketPlayerSchema>
 export type MarketResponse = z.infer<typeof marketResponseSchema>
 
+/** SWR fetcher for /api/market — shared by MarketScreen and the landing TopMovers. */
+export async function fetchMarket(url: string): Promise<MarketResponse> {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`market fetch failed: ${res.status}`)
+  return marketResponseSchema.parse(await res.json())
+}
+
 export function dailyChangePct(currentPrice: string, price24hAgo: string): number {
   const current = parseFloat(currentPrice)
   const baseline = parseFloat(price24hAgo)
