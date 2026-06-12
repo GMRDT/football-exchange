@@ -7,7 +7,15 @@ const compat = new FlatCompat({
 const config = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
-    ignores: ['node_modules/', '.next/', 'public/sw.js', 'next-env.d.ts'],
+    ignores: [
+      'node_modules/',
+      '.next/',
+      'public/sw.js',
+      'next-env.d.ts',
+      // Deno entrypoints (Deno.serve, npm: resolution); _shared stays linted.
+      'supabase/functions/ingest/',
+      'supabase/functions/tick/',
+    ],
   },
 ]
 

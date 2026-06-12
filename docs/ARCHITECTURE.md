@@ -138,11 +138,14 @@ user_id = X` must equal `cash_balance`. Checked daily by `check-invariants.ts`.
 detail, minute)`. The ingest function polls every 30–60s and re-reads the same events.
 Without this constraint, every poll would create duplicate deltas. On conflict: do nothing.
 
-**ADR-003: pending_price_deltas for gradual drip**
-Events update `fair_value` immediately (fundamental anchor). Price `P` moves gradually.
-The delta is stored as a percentage (`remaining_pct NUMERIC`) and consumed in fractions
-by each `tick` call. This implements the 2–5 min drip from the spec without any
-scheduled job per-event.
+**ADR-003: pending_price_deltas for gradual drip** *(updated in F3)*
+Events update `fair_value` immediately (fundamental anchor). Price `P` moves gradually:
+the event enqueues `total_pct NUMERIC` (the same clamped fraction applied to V) and each
+`tick` advances `applied_pct` toward it on **wall-clock progress** over `drip_minutes`,
+deleting the row on completion (exact telescoping formula in MARKET_ENGINE.md §2.2).
+Robust to missed/uneven ticks and idempotent under re-polling. `remaining_pct` is
+deprecated and no longer written. This implements the 2–5 min drip from the spec without
+any scheduled job per-event.
 
 **ADR-004: NUMERIC everywhere for money**
 IEEE 754 floating point cannot represent 0.1 exactly. At scale, rounding errors in

@@ -107,23 +107,42 @@ These live in `market_params.tier_params` (jsonb). Change without deploying.
 
 ### 2.2 Event-driven price drip (gradual P movement)
 Events do NOT move P instantly (prevents TV arbitrage: polling lag is 30–60s).
-Instead, the event queues a delta in `pending_price_deltas`:
+Instead, the event enqueues a delta in `pending_price_deltas`, **atomically with
+the event insert** inside the `ingest_event()` RPC. Idempotency comes from
+`match_events.api_event_key` (ADR-002): a re-polled event conflicts on insert
+and enqueues nothing.
 
-```sql
-INSERT INTO pending_price_deltas (player_id, remaining_pct, source_event_id)
-VALUES (player_id, perf_delta × drip_pct_factor, event_id)
-ON CONFLICT DO NOTHING
+Delta row contents:
+- `total_pct` — the full intended fractional move: the **same clamped fraction
+  applied to fair value** for that event, `clamp(perf_delta × c, -0.15, +0.25)`
+  (i.e. `drip_pct_factor = 1`).
+- `applied_pct` — the portion already reflected in `current_price` (starts 0).
+- `created_at` — drip start time.
+- `remaining_pct` — deprecated (pre-F3), no longer written.
+
+Each `tick()` advances the drip on **wall-clock progress**, which is robust to
+missed or uneven ticks:
+
+```
+progress    = clamp(elapsed_minutes / drip_minutes, 0, 1)
+target      = round6(total_pct × progress)        (= total_pct when progress ≥ 1)
+apply_now   = (1 + target) / (1 + applied_pct) − 1
+P(new)      = round6(P(current) × (1 + apply_now))
+applied_pct = target
 ```
 
-Each `tick()` call consumes a fraction:
-```
-fraction = remaining_pct / drip_steps_remaining
-P(new) = P(current) + P(current) × fraction
-remaining_pct = remaining_pct - fraction
-```
+When `progress ≥ 1` the remainder is applied and the row is **deleted**.
 
-Where `drip_minutes` = 3 (default, in `market_params`).
-At tick interval of 60s, this means ~3 steps to fully apply the delta.
+The `(1 + target) / (1 + applied)` increment telescopes exactly: the product of
+all per-tick factors is `(1 + total_pct)` regardless of tick count or spacing.
+(A naive `target − applied` increment would compound geometrically: 3 × 5% →
+×1.157625 instead of ×1.15.) The denominator cannot vanish: `total_pct ≥ −0.15`
+per the §1.2 clamp ⇒ `1 + applied_pct ≥ 0.85`.
+
+Where `drip_minutes` = 3 (default, in `market_params`). Mean reversion (§2.3)
+absorbs any residual gap between P and V after the drip completes. If the
+circuit breakers (§4) clamp the price mid-drip, `applied_pct` still advances —
+consumed drip is never replayed.
 
 ### 2.3 Mean reversion
 Applied every `tick()` call:
@@ -268,8 +287,9 @@ Run `scripts/simulate-market.ts` against real fixture data to verify:
 | Logic | File | Notes |
 |---|---|---|
 | Pure formulas | `supabase/functions/_shared/market.ts` | No I/O, fully testable |
-| Trade price impact | `supabase/migrations/XXXX_trade_function.sql` | Inside row lock, must be SQL |
-| Event ingestion + V update | `supabase/functions/ingest/index.ts` | Calls market.ts |
-| Price drip + reversion | `supabase/functions/tick/index.ts` | Calls market.ts |
+| Trade price impact | `supabase/migrations/20260611000001_trade_rpc.sql` | Inside row lock, must be SQL |
+| Event ingestion + V update | `supabase/functions/ingest/index.ts` | Calls market.ts; writes via `ingest_event()`/`finalize_match()` RPCs |
+| Price drip + reversion | `supabase/functions/tick/index.ts` | Calls market.ts (via `_shared/tick-core.ts`); writes via `apply_tick()` RPC |
+| Atomic write RPCs | `supabase/migrations/20260611000003_price_engine.sql` | Apply pre-computed values only — NO formulas |
 | Parameters | `market_params` table (single row) | Runtime-tunable |
 | Event points | `event_types` table | Runtime-tunable |
