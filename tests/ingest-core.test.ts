@@ -8,6 +8,7 @@ import {
   ApiFixtureResultSchema,
   ApiResponseSchema,
   buildApiEventKey,
+  createEventKeyBuilder,
   deriveOutcome,
   isFinalStatus,
   mapApiEvent,
@@ -137,6 +138,47 @@ describe('buildApiEventKey (ADR-002)', () => {
     expect(buildApiEventKey(fixtureId, at90, mapApiEvent(at90)[0])).not.toBe(
       buildApiEventKey(fixtureId, at903, mapApiEvent(at903)[0])
     )
+  })
+
+  test('brace: identical events in one poll get positional #N suffixes', () => {
+    // Two goals by the same player at 67' produce identical composites; the
+    // second used to die on ON CONFLICT DO NOTHING. Recorded real payloads
+    // (tests/fixtures/events-*.json) confirm the API sends no event id, so
+    // disambiguation is positional within the poll response.
+    const brace = event({ time: { elapsed: 67, extra: null } })
+    const keyFor = createEventKeyBuilder(fixtureId)
+    const key1 = keyFor(brace, mapApiEvent(brace)[0])
+    const key2 = keyFor(brace, mapApiEvent(brace)[0])
+    const key3 = keyFor(brace, mapApiEvent(brace)[0]) // hat-trick in one minute
+    expect(key1).toBe('1234:33:152982:goal:normal_goal:67:0')
+    expect(key2).toBe('1234:33:152982:goal:normal_goal:67:0#2')
+    expect(key3).toBe('1234:33:152982:goal:normal_goal:67:0#3')
+  })
+
+  test('key builder is idempotent across polls (fresh builder, same response)', () => {
+    const brace = event({ time: { elapsed: 67, extra: null } })
+    const other = event({ time: { elapsed: 70, extra: null } })
+    const poll = () => {
+      const keyFor = createEventKeyBuilder(fixtureId)
+      return [brace, other, brace].map((ev) => keyFor(ev, mapApiEvent(ev)[0]))
+    }
+    expect(poll()).toEqual(poll())
+  })
+
+  test('first occurrence keeps the bare composite (pre-change keys stay valid)', () => {
+    const ev = event()
+    const keyFor = createEventKeyBuilder(fixtureId)
+    expect(keyFor(ev, mapApiEvent(ev)[0])).toBe(
+      buildApiEventKey(fixtureId, ev, mapApiEvent(ev)[0])
+    )
+  })
+
+  test('goal + assist of the same event do not suffix each other', () => {
+    const ev = event({ assist: { id: 999 } })
+    const keyFor = createEventKeyBuilder(fixtureId)
+    const [goal, assist] = mapApiEvent(ev)
+    expect(keyFor(ev, goal)).not.toContain('#')
+    expect(keyFor(ev, assist)).not.toContain('#')
   })
 
   test('null team/minute/detail are stable placeholders, not crashes', () => {

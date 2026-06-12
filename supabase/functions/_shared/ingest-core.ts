@@ -18,10 +18,6 @@ export const ApiResponseSchema = z.object({
 })
 
 export const ApiEventSchema = z.object({
-  // Unique per-event id assigned by API-Football. Nullish defensively: if the
-  // API ever omits it, parsing must not reject the whole event (the key falls
-  // back to the composite form — see buildApiEventKey).
-  id: z.number().nullish(),
   time: z.object({
     elapsed: z.number().nullable(),
     extra: z.number().nullish(),
@@ -136,6 +132,10 @@ export function mapApiEvent(ev: ApiEvent): MappedEvent[] {
  * (fixture, team, player, mapped code, detail, minute, extra). The mapped
  * code (not the raw type) keeps a goal and its assist distinct; extra time
  * keeps 90' and 90+3' distinct. Stable across polls by construction.
+ *
+ * Recorded real payloads (tests/fixtures/events-*.json) confirm API-Football
+ * events carry NO unique id, so duplicates (a brace in the same minute) can
+ * only be disambiguated positionally — see createEventKeyBuilder.
  */
 export function buildApiEventKey(
   apiFixtureId: number,
@@ -152,6 +152,33 @@ export function buildApiEventKey(
     ev.time.elapsed ?? 'x',
     ev.time.extra ?? 0,
   ].join(':')
+}
+
+/**
+ * Per-fixture-poll key builder that fixes the brace collision: two goals by
+ * the same player in the same minute produce identical composites, and the
+ * second one used to die on ON CONFLICT DO NOTHING — silently.
+ *
+ * The Nth occurrence of an identical composite within one poll response gets
+ * the suffix `#N` (N ≥ 2). Idempotent across polls because the API returns
+ * the full event list in stable chronological order every cycle, so the Nth
+ * identical event is always the Nth — and identical events are interchangeable
+ * by definition, so even a reorder among them yields the same key set. The
+ * first occurrence keeps the bare composite: every key ingested before this
+ * change stays valid (no re-keying on deploy).
+ *
+ * Scope one builder to one fixture response; counts must reset per poll.
+ */
+export function createEventKeyBuilder(
+  apiFixtureId: number
+): (ev: ApiEvent, mapped: MappedEvent) => string {
+  const seen = new Map<string, number>()
+  return (ev, mapped) => {
+    const base = buildApiEventKey(apiFixtureId, ev, mapped)
+    const n = (seen.get(base) ?? 0) + 1
+    seen.set(base, n)
+    return n === 1 ? base : `${base}#${n}`
+  }
 }
 
 // ── FT outcome ────────────────────────────────────────────────────────────────

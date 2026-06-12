@@ -18,7 +18,7 @@ import {
   ApiEventSchema,
   ApiFixtureResultSchema,
   ApiResponseSchema,
-  buildApiEventKey,
+  createEventKeyBuilder,
   deriveOutcome,
   isFinalStatus,
   mapApiEvent,
@@ -140,6 +140,9 @@ Deno.serve(async (req: Request) => {
     }
 
     // ── Events: idempotent insert → FV update → drip enqueue, per sub-event ──
+    // One key builder per fixture response: identical composites (brace in
+    // the same minute) get positional #N suffixes (ADR-002).
+    const keyFor = createEventKeyBuilder(match.api_fixture_id)
     for (const raw of fx.events ?? []) {
       const ev = ApiEventSchema.safeParse(raw)
       if (!ev.success) {
@@ -160,7 +163,7 @@ Deno.serve(async (req: Request) => {
           summary.errors.push(`event_types missing code '${mapped.code}'`)
           continue
         }
-        const key = buildApiEventKey(match.api_fixture_id, ev.data, mapped)
+        const key = keyFor(ev.data, mapped)
 
         // Optimistic retry: ingest_event rejects (and rolls back) when our
         // fair-value read went stale; refetch as text and retry.
