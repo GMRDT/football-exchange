@@ -12,6 +12,7 @@
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local > src/lib/supabase/types.ts",
     "seed": "tsx scripts/seed.ts",
+    "seed:force": "tsx scripts/seed.ts --force",
     "check-invariants": "tsx scripts/check-invariants.ts",
     "check-prod-secrets": "tsx scripts/check-prod-secrets.ts",
     "map-api-players": "tsx scripts/map-api-players.ts",
