@@ -18,6 +18,10 @@ export const ApiResponseSchema = z.object({
 })
 
 export const ApiEventSchema = z.object({
+  // Unique per-event id assigned by API-Football. Nullish defensively: if the
+  // API ever omits it, parsing must not reject the whole event (the key falls
+  // back to the composite form — see buildApiEventKey).
+  id: z.number().nullish(),
   time: z.object({
     elapsed: z.number().nullable(),
     extra: z.number().nullish(),
@@ -27,6 +31,9 @@ export const ApiEventSchema = z.object({
   assist: z.object({ id: z.number().nullable() }).nullish(),
   type: z.string(),
   detail: z.string().nullable(),
+  // 'Penalty Shootout' marks shootout kicks (type=Goal) that must never be
+  // priced as in-game penalties.
+  comments: z.string().nullish(),
 })
 
 export type ApiEvent = z.infer<typeof ApiEventSchema>
@@ -61,7 +68,9 @@ export function isFinalStatus(status: string): boolean {
 // ── Event mapping ─────────────────────────────────────────────────────────────
 
 /** event_types.code values an API event can map to (MARKET_ENGINE.md §1.4).
- * clean_sheet_* / motm / injury_out need lineup data — deferred FT sub-task. */
+ * clean_sheet_* / motm / injury_out need lineup data — deferred FT sub-task.
+ * shootout_kick is UNPRICED (default_perf_points = 0): recorded for
+ * reconciliation/activity only, never moves fair value or enqueues a drip. */
 export type EventCode =
   | 'goal'
   | 'assist'
@@ -70,6 +79,7 @@ export type EventCode =
   | 'penalty_scored'
   | 'penalty_missed'
   | 'own_goal'
+  | 'shootout_kick'
 
 export type MappedEvent = {
   code: EventCode
@@ -87,6 +97,16 @@ export function mapApiEvent(ev: ApiEvent): MappedEvent[] {
   const out: MappedEvent[] = []
   const type = ev.type.toLowerCase()
   const detail = (ev.detail ?? '').toLowerCase()
+
+  // Penalty shootout kicks arrive as type=Goal, detail=Penalty/Missed Penalty
+  // with comments='Penalty Shootout'. They are not in-game events: a 5-round
+  // shootout would otherwise compound up to 10 spurious ±6/8% fair-value
+  // moves on top of the AET survival multiplier. Map to the unpriced
+  // shootout_kick code (perf points 0) — never to penalty_scored/missed.
+  if ((ev.comments ?? '').toLowerCase().includes('penalty shootout')) {
+    if (ev.player.id != null) out.push({ code: 'shootout_kick', apiPlayerId: ev.player.id })
+    return out
+  }
 
   if (type === 'goal') {
     if (detail === 'normal goal') {

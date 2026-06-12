@@ -66,6 +66,41 @@ describe('mapApiEvent', () => {
     expect(mapApiEvent(event({ type: 'Something New' }))).toEqual([])
   })
 
+  test('shootout kicks map to unpriced shootout_kick, never penalty_scored', () => {
+    const scored = mapApiEvent(
+      event({ detail: 'Penalty', comments: 'Penalty Shootout' })
+    )
+    expect(scored).toEqual([{ code: 'shootout_kick', apiPlayerId: 152982 }])
+
+    const missed = mapApiEvent(
+      event({ detail: 'Missed Penalty', comments: 'Penalty Shootout' })
+    )
+    expect(missed).toEqual([{ code: 'shootout_kick', apiPlayerId: 152982 }])
+  })
+
+  test('shootout comment match is case-insensitive', () => {
+    expect(
+      mapApiEvent(event({ detail: 'Penalty', comments: 'PENALTY SHOOTOUT' }))[0]?.code
+    ).toBe('shootout_kick')
+  })
+
+  test('shootout kick with null player id maps to nothing', () => {
+    expect(
+      mapApiEvent(event({ detail: 'Penalty', comments: 'Penalty Shootout', player: { id: null } }))
+    ).toEqual([])
+  })
+
+  test('in-game penalties still price normally (comments null or unrelated)', () => {
+    expect(mapApiEvent(event({ detail: 'Penalty', comments: null }))[0]?.code).toBe(
+      'penalty_scored'
+    )
+    expect(
+      mapApiEvent(event({ detail: 'Penalty', comments: 'Confirmed after VAR review' }))[0]?.code
+    ).toBe('penalty_scored')
+    // comments omitted entirely (the common in-game case)
+    expect(mapApiEvent(event({ detail: 'Missed Penalty' }))[0]?.code).toBe('penalty_missed')
+  })
+
   test('null player id yields nothing (assist can still map)', () => {
     expect(mapApiEvent(event({ player: { id: null } }))).toEqual([])
     expect(mapApiEvent(event({ player: { id: null }, assist: { id: 999 } }))).toEqual([

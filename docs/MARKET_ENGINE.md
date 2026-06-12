@@ -75,6 +75,11 @@ Applied to ALL players of the affected team simultaneously.
 | `clean_sheet_def` | Defender clean sheet (90 min) | +0.04 |
 | `motm` | Man of the match | +0.07 |
 | `injury_out` | Subbed off injured | -0.05 |
+| `shootout_kick` | Penalty shootout kick (recorded, never priced) | 0.00 |
+
+Shootout kicks (API-Football `comments = 'Penalty Shootout'`) are NOT in-game
+events: they must never map to `penalty_scored`/`penalty_missed`. They are
+stored with 0 perf points so fair value and the drip queue are untouched.
 
 ---
 
