@@ -138,6 +138,28 @@ Edge Function. Returns `{action: 'inserted' | 'updated' | 'unchanged' | 'skipped
 reason?}` — unresolved `api_team_id`/`sort_order` mappings are `'skipped'`, not
 errors, and `processed = true` matches are never modified (ADR-009).
 
+### `compute_group_standings(p_group_name) → table(team_id, group_name, rank, points, gd, gf, played)`
+Public (callable by `anon` — F4 group tables). Ranks a group from `processed`
+group-stage matches with known scores (`matches.home_goals/away_goals`).
+Tie-break: points, GD, GF, then `api_team_id` (deterministic; FIFA's full
+criteria are not implemented — see MARKET_ENGINE.md §1.3).
+
+### `get_group_exit_state() → jsonb`
+Service-role only. Returns the group-exit decisions executable *right now*
+(teams without a `group_exits` row whose fate is already determined): ranks
+1/2/4 of complete groups, plus all thirds once every group with matches is
+complete (≥ 12). Each decision carries the team's full roster with current
+fair values as text (ADR-004) so the caller prices the survival in
+`market.ts`.
+
+### `finalize_group_exit(p_team_id, p_outcome, p_reason, p_round_id, p_fair_values) → jsonb`
+Service-role only. Applies one team's pre-computed group fate exactly once:
+inserts the `group_exits` ledger row (idempotency gate — re-calls return
+`{applied: false, reason: 'already_decided'}`), writes the supplied fair
+values under an optimistic guard (`fv_conflict` on stale reads, same retry
+contract as `ingest_event`), and marks `teams.is_eliminated` on elimination.
+Contains NO formulas (MARKET_ENGINE.md §8).
+
 ---
 
 ## Database design decisions (ADRs)

@@ -50,7 +50,7 @@ Where:
 - `clamp(-0.15, +0.25)` = per-event cap (prevents single event from destroying a value)
 
 ### 1.3 Tournament survival multiplier
-Applied when a team advances or is eliminated (at match `FT` reconciliation):
+Applied when a team advances or is eliminated:
 
 ```
 survival_multiplier = 1.15  (team advances to next round)
@@ -58,7 +58,33 @@ survival_multiplier = 0.50  (team is eliminated)
 V_new = V_current × survival_multiplier
 ```
 
-Applied to ALL players of the affected team simultaneously.
+Applied to ALL players of the affected team simultaneously. The multiplier is
+computed ONLY in `market.ts` (`applySurvival`); SQL applies pre-computed values.
+
+**Knockout matches:** applied at `FT` reconciliation — winner advances, loser
+eliminated (`finalize_match()`).
+
+**Group stage (WC 2026: 12 groups of 4; 1st + 2nd + the 8 best thirds advance
+to the Round of 32):** standings-based, evaluated by the ingest function after
+any group match finalizes:
+
+- A group is *complete* when its 6 matches are `processed` with known scores
+  (`matches.home_goals/away_goals`, persisted by ingest each poll —
+  `match_events` cannot derive scores: it only records tradable players).
+- On group completion: rank 1 and 2 advance (×1.15), rank 4 is eliminated
+  (×0.50) — immediately, per group.
+- Rank 3 stays untouched until EVERY group is complete; then all 12 thirds are
+  ranked cross-group and the best 8 advance, the other 4 are eliminated.
+- Ranking (within groups and across thirds): points desc, goal difference
+  desc, goals for desc, then `api_team_id` asc (deterministic placeholder).
+  **Limitation:** FIFA's full tie-breakers (head-to-head, fair play, drawing
+  of lots) are NOT implemented — verify against official standings before the
+  last group matchday (see `docs/F3.5-live-test.md`).
+- Idempotency ledger: `group_exits` (one row per team, inserted atomically
+  with the fair-value writes by `finalize_group_exit()`; an optimistic
+  fair-value guard retries on concurrent event ingestion).
+- Standings are public: `compute_group_standings(p_group_name)` is callable
+  by `anon` (F4 group tables).
 
 ### 1.4 Event points table (default values, all tunable in `event_types` table)
 

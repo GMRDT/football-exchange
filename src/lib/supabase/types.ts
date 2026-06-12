@@ -55,6 +55,38 @@ export type Database = {
         }
         Relationships: []
       }
+      group_exits: {
+        Row: {
+          decided_at: string
+          group_name: string
+          outcome: string
+          reason: string
+          team_id: string
+        }
+        Insert: {
+          decided_at?: string
+          group_name: string
+          outcome: string
+          reason: string
+          team_id: string
+        }
+        Update: {
+          decided_at?: string
+          group_name?: string
+          outcome?: string
+          reason?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_exits_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       holdings: {
         Row: {
           avg_cost: number
@@ -268,7 +300,9 @@ export type Database = {
       matches: {
         Row: {
           api_fixture_id: number
+          away_goals: number | null
           away_team_id: string
+          home_goals: number | null
           home_team_id: string
           id: string
           kickoff_utc: string
@@ -278,7 +312,9 @@ export type Database = {
         }
         Insert: {
           api_fixture_id: number
+          away_goals?: number | null
           away_team_id: string
+          home_goals?: number | null
           home_team_id: string
           id?: string
           kickoff_utc: string
@@ -288,7 +324,9 @@ export type Database = {
         }
         Update: {
           api_fixture_id?: number
+          away_goals?: number | null
           away_team_id?: string
+          home_goals?: number | null
           home_team_id?: string
           id?: string
           kickoff_utc?: string
@@ -792,10 +830,33 @@ export type Database = {
     Functions: {
       apply_tick: { Args: { p: Json }; Returns: Json }
       check_cron_health: { Args: never; Returns: Json }
+      compute_group_standings: {
+        Args: { p_group_name: string }
+        Returns: {
+          gd: number
+          gf: number
+          group_name: string
+          played: number
+          points: number
+          rank: number
+          team_id: string
+        }[]
+      }
+      finalize_group_exit: {
+        Args: {
+          p_fair_values?: Json
+          p_outcome: string
+          p_reason: string
+          p_round_id: string
+          p_team_id: string
+        }
+        Returns: Json
+      }
       finalize_match: {
         Args: { p_eliminated?: Json; p_fair_values?: Json; p_match_id: string }
         Returns: Json
       }
+      get_group_exit_state: { Args: never; Returns: Json }
       get_ingest_state: { Args: never; Returns: Json }
       get_tick_state: { Args: never; Returns: Json }
       ingest_event: {

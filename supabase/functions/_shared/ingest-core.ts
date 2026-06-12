@@ -46,6 +46,14 @@ export const ApiFixtureResultSchema = z.object({
     home: z.object({ id: z.number(), winner: z.boolean().nullable() }),
     away: z.object({ id: z.number(), winner: z.boolean().nullable() }),
   }),
+  // Final score — persisted to matches so compute_group_standings() can rank
+  // groups (match_events only covers tradable players, never full scores).
+  goals: z
+    .object({
+      home: z.number().int().nullable(),
+      away: z.number().int().nullable(),
+    })
+    .nullish(),
   // Validated per-event downstream so one malformed event cannot kill the run.
   events: z.array(z.unknown()).nullish(),
 })

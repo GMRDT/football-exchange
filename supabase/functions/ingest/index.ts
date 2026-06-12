@@ -23,6 +23,7 @@ import {
   isFinalStatus,
   mapApiEvent,
 } from '../_shared/ingest-core.ts'
+import { evaluateGroupExits, type RpcClient } from '../_shared/group-exit-core.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -41,6 +42,8 @@ type IngestState = {
     id: string
     api_fixture_id: number
     status: string
+    home_goals: number | null
+    away_goals: number | null
     home_team_id: string
     away_team_id: string
     home_api_team_id: number | null
@@ -75,6 +78,7 @@ Deno.serve(async (req: Request) => {
     events_inserted: 0,
     events_skipped_unmapped: 0,
     matches_finalized: 0,
+    group_exits_applied: 0,
     errors: [] as string[],
   }
 
@@ -100,6 +104,8 @@ Deno.serve(async (req: Request) => {
     else playersByTeam.set(p.team_id, [p.id])
   }
   const eventTypeByCode = new Map(state.event_types.map((et) => [et.code, et]))
+
+  let groupStageFinalized = false
 
   for (const match of state.matches) {
     // ── Fetch fixture (status + score + events in one call) ──────────────────
@@ -134,8 +140,17 @@ Deno.serve(async (req: Request) => {
     }
 
     const status = fx.fixture.status.short
-    if (status !== match.status) {
-      const { error } = await supabase.from('matches').update({ status }).eq('id', match.id)
+    const homeGoals = fx.goals?.home ?? null
+    const awayGoals = fx.goals?.away ?? null
+    if (
+      status !== match.status ||
+      homeGoals !== match.home_goals ||
+      awayGoals !== match.away_goals
+    ) {
+      const { error } = await supabase
+        .from('matches')
+        .update({ status, home_goals: homeGoals, away_goals: awayGoals })
+        .eq('id', match.id)
       if (error) summary.errors.push(`match ${match.id} status update: ${error.message}`)
     }
 
@@ -214,12 +229,15 @@ Deno.serve(async (req: Request) => {
 
     const isKnockout = match.round_sort_order >= 2
     if (!isKnockout) {
-      // A single group match never decides advancement; group-exit detection
-      // (cross-group best-third standings) is a separate F3 sub-task. Mark
-      // processed with no survival change.
+      // A single group match never decides advancement: mark processed with
+      // no survival change, then evaluate group exits once after the loop
+      // (standings-based, see _shared/group-exit-core.ts).
       const { error } = await supabase.rpc('finalize_match', { p_match_id: match.id })
       if (error) summary.errors.push(`finalize_match ${match.id}: ${error.message}`)
-      else summary.matches_finalized++
+      else {
+        summary.matches_finalized++
+        groupStageFinalized = true
+      }
       continue
     }
 
@@ -266,6 +284,15 @@ Deno.serve(async (req: Request) => {
     } else if ((finalized as { processed: boolean }).processed) {
       summary.matches_finalized++
     }
+  }
+
+  // ── Group exits: standings-based advancement/elimination (F3.6) ───────────
+  // Only worth checking when this run finalized a group match — completion of
+  // a group (or of all 12) can only flip on that edge.
+  if (groupStageFinalized) {
+    const exits = await evaluateGroupExits(supabase as unknown as RpcClient)
+    summary.group_exits_applied += exits.applied
+    summary.errors.push(...exits.errors)
   }
 
   return json(summary)

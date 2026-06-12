@@ -209,8 +209,14 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
         bracket settles (ADR-009). Deployed + live: cron run 2026-06-12 12:00 UTC synced
         all 72 group fixtures; ingest/tick deployed 15:32 UTC and backfilled the 2 FT
         matches (see `docs/F3.5-live-test.md`)
-  - [ ] Group-exit elimination detection (cross-group best-third standings; knockout
-        advancement/elimination is already automatic — launch Jun 28 is Round of 16)
+  - [x] Group-exit elimination detection (cross-group best-third standings; knockout
+        advancement/elimination is already automatic). Standings from
+        `matches.home_goals/away_goals` (persisted by ingest);
+        `compute_group_standings()` + `get_group_exit_state()` +
+        `finalize_group_exit()` (migration 20260612000003), survival priced in
+        `market.ts`, `group_exits` idempotency ledger, integration-tested
+        (single group + 12-group thirds + idempotency). ⚠ post-merge: backfill
+        goals of the 2 already-processed fixtures (see F3-completion-report.md)
   - [ ] Lineup-based FT events (`clean_sheet_gk/def`, `motm`, `injury_out`) — needs
         `player_match_appearances` ingestion
 
