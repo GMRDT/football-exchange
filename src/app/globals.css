@@ -1,1 +1,32 @@
 @import "tailwindcss";
+
+@theme {
+  /* --- Color tokens (DESIGN.md §2) --- */
+  --color-primary: #2D5BFF;
+  --color-primary-pressed: #1E44D9;
+  --color-up: #16A34A;
+  --color-up-soft: #F0FDF4;
+  --color-down: #DC2626;
+  --color-down-soft: #FEF2F2;
+  --color-gold: #F59E0B;
+  --color-warning: #D97706;
+  --color-bg: #FAFAF9;
+  --color-surface: #FFFFFF;
+  --color-border: #E7E5E4;
+  --color-text: #1C1917;
+  --color-text-muted: #78716C;
+
+  /* --- Typography (DESIGN.md §3) --- */
+  /* --font-inter and --font-manrope injected by next/font at runtime */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-manrope), ui-sans-serif, sans-serif;
+}
+
+/* Base layer: apply token defaults to the document */
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+  }
+}

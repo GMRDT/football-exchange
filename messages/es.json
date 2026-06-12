@@ -19,7 +19,23 @@
     "signUp": "Registrarse",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "continueWithGoogle": "Continuar con Google"
+    "continueWithGoogle": "Continuar con Google",
+    "orContinueWith": "o",
+    "loginTitle": "Bienvenido de nuevo",
+    "loginButton": "Iniciar sesión",
+    "noAccount": "¿No tienes cuenta?",
+    "signUpLink": "Regístrate gratis",
+    "signupTitle": "Crea tu cuenta",
+    "username": "Nombre de usuario",
+    "usernameHint": "3–20 caracteres: letras, números y guiones bajos",
+    "signupButton": "Crear cuenta",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "loginLink": "Inicia sesión",
+    "checkEmailTitle": "Revisa tu correo",
+    "checkEmailBody": "Enviamos un enlace de confirmación a {email}. Haz clic en él para activar tu cuenta y recibir 100.000 FX Coins.",
+    "errorInvalidCredentials": "Correo o contraseña incorrectos.",
+    "errorGeneric": "Algo salió mal. Por favor intenta de nuevo.",
+    "errorInvalidUsername": "El nombre de usuario debe tener 3–20 caracteres: solo letras, números y guiones bajos."
   },
   "market": {
     "title": "Mercado",
@@ -61,6 +77,8 @@
     "volumeCap": "Límite de volumen diario alcanzado",
     "rateLimited": "Demasiadas operaciones, por favor espera",
     "invalidInput": "Entrada no válida",
-    "playerNotFound": "Jugador no encontrado"
+    "playerNotFound": "Jugador no encontrado",
+    "unauthorized": "Inicia sesión para operar",
+    "tradingPaused": "Las operaciones están pausadas"
   }
 }

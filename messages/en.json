@@ -19,7 +19,23 @@
     "signUp": "Sign Up",
     "email": "Email",
     "password": "Password",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "or",
+    "loginTitle": "Welcome back",
+    "loginButton": "Sign in",
+    "noAccount": "Don't have an account?",
+    "signUpLink": "Sign up free",
+    "signupTitle": "Create your account",
+    "username": "Username",
+    "usernameHint": "3–20 characters: letters, numbers, underscores",
+    "signupButton": "Create account",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "checkEmailTitle": "Check your email",
+    "checkEmailBody": "We sent a confirmation link to {email}. Click it to activate your account and get 100,000 FX Coins.",
+    "errorInvalidCredentials": "Incorrect email or password.",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorInvalidUsername": "Username must be 3–20 characters: letters, numbers, underscores only."
   },
   "market": {
     "title": "Market",
@@ -61,6 +77,8 @@
     "volumeCap": "Daily volume cap reached",
     "rateLimited": "Too many trades, please wait",
     "invalidInput": "Invalid input",
-    "playerNotFound": "Player not found"
+    "playerNotFound": "Player not found",
+    "unauthorized": "Please sign in to trade",
+    "tradingPaused": "Trading is currently paused"
   }
 }
