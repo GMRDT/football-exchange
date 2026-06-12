@@ -28,6 +28,8 @@ pnpm db:reset                     # supabase db reset (local)
 pnpm db:types                     # supabase gen types typescript → src/lib/supabase/types.ts
 pnpm seed                         # npx tsx scripts/seed.ts
 pnpm check-invariants             # npx tsx scripts/check-invariants.ts
+pnpm check-prod-secrets           # npx tsx scripts/check-prod-secrets.ts (Vault + cron health)
+pnpm map-api-players [--top N]    # npx tsx scripts/map-api-players.ts (populate api_player_id)
 pnpm record-fixture [fixture_id]  # npx tsx scripts/record-fixtures.ts
 ```
 
@@ -68,6 +70,8 @@ These are hard constraints. Violating any is a critical bug, not a code style is
 ## Release checklist (before merging schema changes to production)
 - [ ] `supabase db push` to production BEFORE merging the code that depends on it
 - [ ] `pnpm check-invariants` passes on production data
+- [ ] `pnpm check-prod-secrets` passes against production (Vault secrets + cron jobs live —
+      a missing Vault secret fails SILENTLY and no price ever moves)
 - [ ] `pnpm test:integration` green locally
 - [ ] RLS audit: tested as `anon` role
 

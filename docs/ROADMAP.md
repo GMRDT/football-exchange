@@ -139,39 +139,53 @@ Goal: atomic trade function with full invariant guarantees.
 Goal: events from API-Football → prices moving in the game, verified against real matches.
 Overlap with F2 end: F3 starts once F1 schema is stable.
 
-- [ ] **F3.1** Pure math module (Prompt 4 → Claude Code)
-  - [ ] `supabase/functions/_shared/market.ts`
-  - [ ] `computeEventDeltaPct(event, params)` — returns perf delta from event
-  - [ ] `updateFairValue(V, perf_delta, c)` — applies to V
-  - [ ] `applySurvivalMultiplier(V, advanced: boolean)` — 1.15 or 0.50
-  - [ ] `applyMeanReversion(P, V, lambda)` — returns new P
-  - [ ] `computeDripStep(remaining_pct, steps_left)` — fraction to apply this tick
-  - [ ] `clampCircuitBreakers(P_new, P_old, V, params)` — enforces all limits
-  - [ ] `getSpread(hasLiveMatch: boolean, params)` — returns spread value
-  - [ ] Unit tests covering edge cases (min price, circuit breaker hits, lambda range)
+- [x] **F3.1** Pure math module (Prompt 4 → Claude Code)
+  - [x] `supabase/functions/_shared/market.ts`
+  - [x] `eventDeltaPct(perfPoints, c)` — clamped perf delta from event (was computeEventDeltaPct)
+  - [x] `applyEventToFairValue(V, perfPoints, c)` — applies to V (was updateFairValue)
+  - [x] `applySurvival(V, advanced: boolean)` — 1.15 or 0.50
+  - [x] `meanReversion(P, V, lambda)` — returns new P
+  - [x] `computeDrip(total_pct, applied_pct, created_at, now, drip_minutes)` — wall-clock
+        drip with exact telescoping (supersedes the steps-based computeDripStep; §2.2)
+  - [x] `applyCircuitBreakers(P_new, base_value, ref_price, params)` — enforces all limits
+  - [ ] `getSpread(hasLiveMatch: boolean, params)` — not needed by ingest/tick; spread
+        selection lives in `trade()` SQL where it is used (deferred until a TS caller exists)
+  - [x] Unit tests covering edge cases (clamp caps, min price, breaker hits, drip exactness,
+        decimal precision)
 
-- [ ] **F3.2** Ingest Edge Function
-  - [ ] Fetches today's World Cup fixtures
-  - [ ] For live fixtures: fetches events, upserts with `api_event_key` (idempotent)
-  - [ ] Updates `players.fair_value` immediately per new events
-  - [ ] Queues `pending_price_deltas` for new events
-  - [ ] On fixture `FT`: reconciliation pass, applies survival multiplier, marks `matches.processed`
-  - [ ] Defensive null handling (empty arrays, null player IDs)
-  - [ ] Test with recorded fixture JSON from `tests/fixtures/`
+- [x] **F3.2** Ingest Edge Function
+  - [x] Polls unprocessed fixtures by `api_fixture_id` (status + score + events in one call)
+  - [x] For live fixtures: fetches events, upserts with `api_event_key` (idempotent,
+        atomic via `ingest_event()` RPC)
+  - [x] Updates `players.fair_value` immediately per new events (optimistic-retry guard)
+  - [x] Queues `pending_price_deltas` for new events (same atomic RPC)
+  - [x] On fixture `FT`: knockout survival multiplier + elimination flags, marks
+        `matches.processed` exactly once (`finalize_match()` guard). Group-stage FT marks
+        processed only — group-exit detection is F3.6
+  - [x] Defensive null handling (empty arrays, null player IDs, unmapped api_player_id →
+        skip + log)
+  - [x] Tested with synthetic API-shaped fixtures (`tests/fixtures/` had no recordings yet;
+        recording real fixtures remains a parallel human task)
 
-- [ ] **F3.3** Tick Edge Function
-  - [ ] Reads `pending_price_deltas` (unprocessed)
-  - [ ] Applies drip fraction to `P`, decrements `remaining_pct`
-  - [ ] Applies mean reversion to all players with recent activity
-  - [ ] Writes `price_history` (reason: 'event_drip' | 'reversion')
-  - [ ] Refreshes materialized `v_leaderboard`
-  - [ ] Idempotent: running tick twice = same result as running once (no double-application)
+- [x] **F3.3** Tick Edge Function
+  - [x] Reads pending deltas + player state in one RPC (`get_tick_state()`)
+  - [x] Applies wall-clock drip to `P`, advances `applied_pct`, deletes completed deltas
+  - [x] Applies mean reversion to every player (settled players no-op at 6 dp)
+  - [x] Writes `price_history` (reason: 'tick' — one combined snapshot per tick; drip and
+        reversion are inseparable in a single price move)
+  - [x] `v_leaderboard` refresh scheduled directly in pg_cron (CONCURRENTLY cannot run
+        inside a function transaction)
+  - [x] Idempotent: wall-clock drip + optimistic per-player guard in `apply_tick()` —
+        double-running a tick applies zero
 
-- [ ] **F3.4** Scheduling (pg_cron jobs — migration)
-  - [ ] `tick` every 60s: `SELECT pg_net.http_post(...)` → tick Edge Function
-  - [ ] `ingest` every 45s (match days: Jun 11–Jul 14, round-of-16 onwards always)
-  - [ ] Cron jobs only fire ingest when there are fixtures today (query check inside function)
-  - [ ] Jobs documented in migration file
+- [x] **F3.4** Scheduling (pg_cron jobs — migration `20260611000003_price_engine.sql`)
+  - [x] `tick` every 60s: pg_cron → `invoke_edge_function()` → pg_net → Edge Function
+  - [x] `ingest` every 60s (cron's finest granularity; 45s/30s polling is a post-launch
+        optimization — the drip smooths the lag)
+  - [x] Ingest no-ops cheaply when there are no started unprocessed fixtures (query check
+        inside `get_ingest_state()`)
+  - [x] Jobs documented in migration file; secrets via Vault (`pnpm check-prod-secrets`
+        validates before launch)
 
 - [ ] **F3.5** Live test (critical gate)
   - [ ] Motor running against at least ONE real group-stage match
@@ -179,6 +193,17 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
   - [ ] Verify: events cause fair_value to update, P drips over ~3 min, no double-deltas
   - [ ] Verify: invariants pass after live match
   - [ ] Simulate calibration targets from MARKET_ENGINE.md §7
+
+- [ ] **F3.6** Live wiring (engine is built and synthetic-tested; these connect it to reality)
+  - [x] `pnpm map-api-players` tool: squads-based name match, top-N by base_value,
+        idempotent DB write for unambiguous matches, review CSV for the rest
+  - [ ] Run `pnpm map-api-players` against the live API (needs API budget) + review CSV
+        — at minimum the top 20 by base_value before F3.5
+  - [ ] Map `teams.api_team_id` + seed `matches` fixtures (prerequisite for ingest)
+  - [ ] Group-exit elimination detection (cross-group best-third standings; knockout
+        advancement/elimination is already automatic — launch Jun 28 is Round of 16)
+  - [ ] Lineup-based FT events (`clean_sheet_gk/def`, `motm`, `injury_out`) — needs
+        `player_match_appearances` ingestion
 
 ---
 
