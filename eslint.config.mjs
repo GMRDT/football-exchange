@@ -15,6 +15,7 @@ const config = [
       // Deno entrypoints (Deno.serve, npm: resolution); _shared stays linted.
       'supabase/functions/ingest/',
       'supabase/functions/tick/',
+      'supabase/functions/sync-fixtures/',
     ],
   },
 ]

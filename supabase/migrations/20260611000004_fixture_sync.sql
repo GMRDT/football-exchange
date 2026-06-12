@@ -1,4 +1,4 @@
--- F4 fixture sync: sync_fixture() RPC + invoke-sync-fixtures cron job.
+-- Fixture sync (ROADMAP F3.6 automation): sync_fixture() RPC + invoke-sync-fixtures cron job.
 --
 -- The sync-fixtures Edge Function fetches the full World Cup fixture list
 -- (GET /fixtures?league=1&season=2026 — one API request) every 6 hours and
