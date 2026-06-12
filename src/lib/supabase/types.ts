@@ -812,6 +812,17 @@ export type Database = {
         Returns: Json
       }
       invoke_edge_function: { Args: { p_name: string }; Returns: undefined }
+      sync_fixture: {
+        Args: {
+          p_api_fixture_id: number
+          p_away_api_team_id: number
+          p_home_api_team_id: number
+          p_kickoff: string
+          p_round_sort_order: number
+          p_status: string
+        }
+        Returns: Json
+      }
       trade: {
         Args: { p_player_id: string; p_shares: number; p_side: string }
         Returns: Json
