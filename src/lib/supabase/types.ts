@@ -322,25 +322,31 @@ export type Database = {
       }
       pending_price_deltas: {
         Row: {
+          applied_pct: number
           created_at: string
           id: string
           player_id: string
-          remaining_pct: number
+          remaining_pct: number | null
           source_event_id: string | null
+          total_pct: number
         }
         Insert: {
+          applied_pct?: number
           created_at?: string
           id?: string
           player_id: string
-          remaining_pct: number
+          remaining_pct?: number | null
           source_event_id?: string | null
+          total_pct: number
         }
         Update: {
+          applied_pct?: number
           created_at?: string
           id?: string
           player_id?: string
-          remaining_pct?: number
+          remaining_pct?: number | null
           source_event_id?: string | null
+          total_pct?: number
         }
         Relationships: [
           {
@@ -784,6 +790,28 @@ export type Database = {
       }
     }
     Functions: {
+      apply_tick: { Args: { p: Json }; Returns: Json }
+      check_cron_health: { Args: never; Returns: Json }
+      finalize_match: {
+        Args: { p_eliminated?: Json; p_fair_values?: Json; p_match_id: string }
+        Returns: Json
+      }
+      get_ingest_state: { Args: never; Returns: Json }
+      get_tick_state: { Args: never; Returns: Json }
+      ingest_event: {
+        Args: {
+          p_api_event_key: string
+          p_event_type_id: string
+          p_expected_fair_value: number
+          p_match_id: string
+          p_minute: number
+          p_new_fair_value: number
+          p_player_id: string
+          p_total_pct: number
+        }
+        Returns: Json
+      }
+      invoke_edge_function: { Args: { p_name: string }; Returns: undefined }
       trade: {
         Args: { p_player_id: string; p_shares: number; p_side: string }
         Returns: Json
