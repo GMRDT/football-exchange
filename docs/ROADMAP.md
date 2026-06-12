@@ -17,7 +17,7 @@ Goal: working repo, tooling, CI, and 6 docs. Nothing else.
   - [ ] GitHub repo created (`football-exchange`, private)
   - [ ] Supabase project created (region: closest to Colombia → us-east-1 or us-west-2)
   - [ ] Vercel project linked to GitHub repo
-  - [ ] API-Football paid plan activated (needed by ~Jun 16 for group stage polling)
+  - [x] API-Football paid plan activated (Pro, active until Jul 12 — verified 2026-06-12)
   - [ ] Cloudflare Turnstile site registered
   - [ ] All secrets saved to password manager + Vercel env vars + Supabase secrets
 
@@ -82,9 +82,9 @@ Goal: complete normalized schema, RLS on everything, 200 players seeded with rea
 
 - [ ] **F1.5** Local validation
   - [x] `supabase db reset` clean
-  - [ ] `supabase link` + `supabase db push` to remote project
-  - [ ] `pnpm seed` populates ~200 players
-  - [ ] Seed count report: 48 teams, ~200 players, 1 market_params row
+  - [x] `supabase link` + `supabase db push` to remote project (all 15 migrations applied)
+  - [x] `pnpm seed` populates ~200 players
+  - [x] Seed count report: 48 teams, 213 players, 1 market_params row (prod, 2026-06-12)
 
 > ⚠️ **Human task (parallel, ~4h):** curate `data/players.csv` with real values.
 > Do NOT scrape Transfermarkt (ToS violation). Use your own approximations.
@@ -188,6 +188,8 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
         validates before launch)
 
 - [ ] **F3.5** Live test (critical gate)
+  > Runbook: `docs/F3.5-live-test.md` — smoke: Canada–Bosnia Jun 12 14:00 COT;
+  > primary: USA–Paraguay Jun 12 20:00 COT (engine already live, backfill verified)
   - [ ] Motor running against at least ONE real group-stage match
   - [ ] 3–5 test accounts trading during the match
   - [ ] Verify: events cause fair_value to update, P drips over ~3 min, no double-deltas
@@ -197,14 +199,16 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
 - [ ] **F3.6** Live wiring (engine is built and synthetic-tested; these connect it to reality)
   - [x] `pnpm map-api-players` tool: squads-based name match, top-N by base_value,
         idempotent DB write for unambiguous matches, review CSV for the rest
-  - [ ] Run `pnpm map-api-players` against the live API (needs API budget) + review CSV
-        — at minimum the top 20 by base_value before F3.5
+  - [x] Run `pnpm map-api-players` against the live API + review CSV — **213/213 mapped**
+        (2026-06-12; squads endpoint now abbreviates names, so the 28 ambiguous/missing
+        were identity-verified via `/players/profiles` full name + nationality)
   - [x] Map `teams.api_team_id` (54/54 mapped via squad fetch)
   - [x] `matches` seeding automated: `sync-fixtures` Edge Function + `invoke-sync-fixtures`
         pg_cron job (every 6h) upsert the full fixture list by `api_fixture_id` — new
         fixtures, kickoff changes, status updates, TBD knockout slots picked up once the
-        bracket settles (ADR-009). Deploy + first live run remain human-gated
-        (`pnpm trigger-fn sync-fixtures`)
+        bracket settles (ADR-009). Deployed + live: cron run 2026-06-12 12:00 UTC synced
+        all 72 group fixtures; ingest/tick deployed 15:32 UTC and backfilled the 2 FT
+        matches (see `docs/F3.5-live-test.md`)
   - [ ] Group-exit elimination detection (cross-group best-third standings; knockout
         advancement/elimination is already automatic — launch Jun 28 is Round of 16)
   - [ ] Lineup-based FT events (`clean_sheet_gk/def`, `motm`, `injury_out`) — needs
