@@ -15,7 +15,8 @@
     "check-invariants": "tsx scripts/check-invariants.ts",
     "check-prod-secrets": "tsx scripts/check-prod-secrets.ts",
     "map-api-players": "tsx scripts/map-api-players.ts",
-    "record-fixture": "tsx scripts/record-fixture.ts"
+    "record-fixture": "tsx scripts/record-fixture.ts",
+    "trigger-fn": "tsx scripts/trigger-edge-function.ts"
   },
   "dependencies": {
     "@serwist/next": "^9",
