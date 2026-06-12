@@ -2,7 +2,19 @@
 /**
  * Idempotent seed: teams + players from data/teams.csv and data/players.csv.
  * Runs as service_role → bypasses RLS.
- * Safe to run multiple times: uses ON CONFLICT DO UPDATE.
+ *
+ * ⚠⚠⚠ WARNING — READ BEFORE RUNNING AGAINST PRODUCTION ⚠⚠⚠
+ * Default mode is INSERT-ONLY for players (ON CONFLICT DO NOTHING): existing
+ * players are NEVER updated, so live market state (fair_value, current_price)
+ * and squad-verified api_player_id mappings written by `pnpm map-api-players`
+ * are preserved. New players in the CSV are still inserted.
+ *
+ * `--force` (pnpm seed:force) restores the destructive full upsert for DEV
+ * environments only: it OVERWRITES fair_value and current_price back to
+ * base_value and replaces api_player_id with whatever the CSV says. Running
+ * it against production after launch destroys the live market. Don't.
+ *
+ * Teams remain a full upsert in both modes (no financial state on teams).
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -31,6 +43,9 @@ if (!supabaseUrl || !serviceRoleKey) {
 const supabase = createClient<Database>(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false },
 })
+
+// --force: destructive full upsert (dev only — see WARNING above).
+const force = process.argv.includes('--force')
 
 // ── Zod schemas ───────────────────────────────────────────────────────────────
 
@@ -173,17 +188,22 @@ async function main() {
     }
   })
 
+  // Default: insert-only. Existing players keep fair_value/current_price
+  // (live market state) and api_player_id (squad-verified mappings) intact.
+  // --force restores the destructive upsert that resets all of those to CSV
+  // values — dev environments only.
   const { error: playersUpsertErr } = await supabase
     .from('players')
-    .upsert(playerInserts, { onConflict: 'full_name,team_id' })
+    .upsert(playerInserts, { onConflict: 'full_name,team_id', ignoreDuplicates: !force })
 
   if (playersUpsertErr) {
     console.error('Players upsert failed:', playersUpsertErr.message)
     process.exit(1)
   }
 
+  console.log(`Mode:           ${force ? 'FORCE (destructive upsert)' : 'insert-only'}`)
   console.log(`Teams seeded:   ${teamInserts.length}`)
-  console.log(`Players seeded: ${playerInserts.length}`)
+  console.log(`Players in CSV: ${playerInserts.length}${force ? '' : ' (existing rows untouched)'}`)
 }
 
 main().catch((err: unknown) => {

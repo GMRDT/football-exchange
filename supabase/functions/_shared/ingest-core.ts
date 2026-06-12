@@ -27,6 +27,9 @@ export const ApiEventSchema = z.object({
   assist: z.object({ id: z.number().nullable() }).nullish(),
   type: z.string(),
   detail: z.string().nullable(),
+  // 'Penalty Shootout' marks shootout kicks (type=Goal) that must never be
+  // priced as in-game penalties.
+  comments: z.string().nullish(),
 })
 
 export type ApiEvent = z.infer<typeof ApiEventSchema>
@@ -61,7 +64,9 @@ export function isFinalStatus(status: string): boolean {
 // ── Event mapping ─────────────────────────────────────────────────────────────
 
 /** event_types.code values an API event can map to (MARKET_ENGINE.md §1.4).
- * clean_sheet_* / motm / injury_out need lineup data — deferred FT sub-task. */
+ * clean_sheet_* / motm / injury_out need lineup data — deferred FT sub-task.
+ * shootout_kick is UNPRICED (default_perf_points = 0): recorded for
+ * reconciliation/activity only, never moves fair value or enqueues a drip. */
 export type EventCode =
   | 'goal'
   | 'assist'
@@ -70,6 +75,7 @@ export type EventCode =
   | 'penalty_scored'
   | 'penalty_missed'
   | 'own_goal'
+  | 'shootout_kick'
 
 export type MappedEvent = {
   code: EventCode
@@ -87,6 +93,16 @@ export function mapApiEvent(ev: ApiEvent): MappedEvent[] {
   const out: MappedEvent[] = []
   const type = ev.type.toLowerCase()
   const detail = (ev.detail ?? '').toLowerCase()
+
+  // Penalty shootout kicks arrive as type=Goal, detail=Penalty/Missed Penalty
+  // with comments='Penalty Shootout'. They are not in-game events: a 5-round
+  // shootout would otherwise compound up to 10 spurious ±6/8% fair-value
+  // moves on top of the AET survival multiplier. Map to the unpriced
+  // shootout_kick code (perf points 0) — never to penalty_scored/missed.
+  if ((ev.comments ?? '').toLowerCase().includes('penalty shootout')) {
+    if (ev.player.id != null) out.push({ code: 'shootout_kick', apiPlayerId: ev.player.id })
+    return out
+  }
 
   if (type === 'goal') {
     if (detail === 'normal goal') {
@@ -116,6 +132,10 @@ export function mapApiEvent(ev: ApiEvent): MappedEvent[] {
  * (fixture, team, player, mapped code, detail, minute, extra). The mapped
  * code (not the raw type) keeps a goal and its assist distinct; extra time
  * keeps 90' and 90+3' distinct. Stable across polls by construction.
+ *
+ * Recorded real payloads (tests/fixtures/events-*.json) confirm API-Football
+ * events carry NO unique id, so duplicates (a brace in the same minute) can
+ * only be disambiguated positionally — see createEventKeyBuilder.
  */
 export function buildApiEventKey(
   apiFixtureId: number,
@@ -132,6 +152,33 @@ export function buildApiEventKey(
     ev.time.elapsed ?? 'x',
     ev.time.extra ?? 0,
   ].join(':')
+}
+
+/**
+ * Per-fixture-poll key builder that fixes the brace collision: two goals by
+ * the same player in the same minute produce identical composites, and the
+ * second one used to die on ON CONFLICT DO NOTHING — silently.
+ *
+ * The Nth occurrence of an identical composite within one poll response gets
+ * the suffix `#N` (N ≥ 2). Idempotent across polls because the API returns
+ * the full event list in stable chronological order every cycle, so the Nth
+ * identical event is always the Nth — and identical events are interchangeable
+ * by definition, so even a reorder among them yields the same key set. The
+ * first occurrence keeps the bare composite: every key ingested before this
+ * change stays valid (no re-keying on deploy).
+ *
+ * Scope one builder to one fixture response; counts must reset per poll.
+ */
+export function createEventKeyBuilder(
+  apiFixtureId: number
+): (ev: ApiEvent, mapped: MappedEvent) => string {
+  const seen = new Map<string, number>()
+  return (ev, mapped) => {
+    const base = buildApiEventKey(apiFixtureId, ev, mapped)
+    const n = (seen.get(base) ?? 0) + 1
+    seen.set(base, n)
+    return n === 1 ? base : `${base}#${n}`
+  }
 }
 
 // ── FT outcome ────────────────────────────────────────────────────────────────
