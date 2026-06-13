@@ -29,8 +29,10 @@ const connectSrc = [
   .filter(Boolean)
   .join(' ')
 
-// CSP: 'unsafe-eval' intentionally omitted — Next.js 15 doesn't require it in
-// production. If a dependency ever needs eval, the fix is nonces/hashes (F5).
+const isDev = process.env.NODE_ENV === 'development'
+
+// 'unsafe-eval' is only added in dev — Next.js webpack HMR (react-refresh-utils)
+// uses eval() for source maps. Production stays strict; F5 will add nonces.
 const securityHeaders = [
   {
     key: 'Strict-Transport-Security',
@@ -48,7 +50,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self'",
