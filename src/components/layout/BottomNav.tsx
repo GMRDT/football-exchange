@@ -14,8 +14,7 @@ const TABS = [
   // routes exist → normal (default) prefetch
   { href: '/market', key: 'market', icon: MarketIcon, prefetch: undefined },
   { href: '/portfolio', key: 'portfolio', icon: PortfolioIcon, prefetch: undefined },
-  // TODO(F4.5): quitar prefetch={false} al crear esta ruta — restaura navegación instantánea.
-  { href: '/leaderboard', key: 'leaderboard', icon: LeaderboardIcon, prefetch: false },
+  { href: '/leaderboard', key: 'leaderboard', icon: LeaderboardIcon, prefetch: undefined },
 ] as const
 
 export function BottomNav() {

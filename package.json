@@ -19,7 +19,8 @@
     "record-fixture": "tsx scripts/record-fixture.ts",
     "record-fixtures": "tsx scripts/record-fixtures.ts",
     "trigger-fn": "tsx scripts/trigger-edge-function.ts",
-    "e2e:portfolio": "tsx scripts/e2e-portfolio.ts"
+    "e2e:portfolio": "tsx scripts/e2e-portfolio.ts",
+    "e2e:leaderboard": "tsx scripts/e2e-leaderboard.ts"
   },
   "dependencies": {
     "@serwist/next": "10.0.0-preview.14",
@@ -46,6 +47,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
     "@types/papaparse": "^5.5.2",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/ws": "^8.18.1",
@@ -55,6 +57,7 @@
     "eslint": "^9",
     "eslint-config-next": "^15",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "pg": "^8.21.0",
     "prettier": "^3",
     "tailwindcss": "^4",
     "tsx": "^4",

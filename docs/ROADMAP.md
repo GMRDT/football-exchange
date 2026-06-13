@@ -265,10 +265,12 @@ Goal: 5 screens + PWA installation. Starts only after F2 green; F3 running in ba
   - [x] Share button (Web Share API + clipboard fallback)
 
 - [ ] **F4.5** Screen 4: Leaderboard + Private Leagues
-  - [ ] Global leaderboard (% return, rank, username, portfolio value)
-  - [ ] Create private league (generates invite code)
-  - [ ] Join private league (enter invite code)
-  - [ ] League leaderboard
+  - [x] Global leaderboard (% return, rank, username, portfolio value) — built 2026-06-13.
+        Public `/leaderboard` reads `v_leaderboard` (matview, ranks on `return_pct`, ADR-007);
+        signed-in user's row is highlighted / pinned. E2E: `pnpm e2e:leaderboard`.
+  - [ ] Create private league (generates invite code) — deferred (needs write RPC + RLS, own PR)
+  - [ ] Join private league (enter invite code) — deferred
+  - [ ] League leaderboard — deferred
 
 - [ ] **F4.6** Screen 5: Activity Feed
   - [ ] Events affecting YOUR players: ⚽ goal, 🟨 yellow, 🟥 red, 📈 price move
