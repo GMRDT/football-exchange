@@ -235,11 +235,11 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
 
 Goal: 5 screens + PWA installation. Starts only after F2 green; F3 running in background.
 
-- [ ] **F4.1** Supabase client setup
-  - [ ] `src/lib/supabase/client.ts` — browser client
-  - [ ] `src/lib/supabase/server.ts` — server component client
-  - [ ] Auth: email/password + Google OAuth + Turnstile integration
-  - [ ] Auth guards (middleware for protected routes)
+- [ ] **F4.1** Supabase client setup — clients + guards built 2026-06-12; only Turnstile pending (→ F5)
+  - [x] `src/lib/supabase/client.ts` — browser client
+  - [x] `src/lib/supabase/server.ts` — server component client
+  - [ ] Auth: email/password + Google OAuth done; Turnstile integration pending (→ F5)
+  - [x] Auth guards (middleware for protected routes — `src/middleware.ts`, protects `/portfolio`, `/activity`)
 
 - [x] **F4.2** Screen 1: Market — built 2026-06-12
   - [x] Screener: avatar (initials + team colors), player name, price, % change
