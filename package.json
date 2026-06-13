@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@serwist/next": "^9",
+    "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
     "next": "^15",
     "next-intl": "^3",
@@ -29,6 +30,7 @@
     "react": "^19",
     "react-dom": "^19",
     "serwist": "^9",
+    "swr": "^2.4.1",
     "zod": "^3"
   },
   "pnpm": {

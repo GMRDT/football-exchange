@@ -858,6 +858,21 @@ export type Database = {
       }
       get_group_exit_state: { Args: never; Returns: Json }
       get_ingest_state: { Args: never; Returns: Json }
+      get_market_summary: {
+        Args: never
+        Returns: {
+          avatar_colors: Json
+          current_price: string
+          fair_value: string
+          full_name: string
+          id: string
+          liquidity_tier: string
+          position_code: string
+          price_24h_ago: string
+          team_id: string
+          team_name: string
+        }[]
+      }
       get_tick_state: { Args: never; Returns: Json }
       ingest_event: {
         Args: {

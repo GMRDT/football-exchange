@@ -19,7 +19,23 @@
     "signUp": "Sign Up",
     "email": "Email",
     "password": "Password",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "or",
+    "loginTitle": "Welcome back",
+    "loginButton": "Sign in",
+    "noAccount": "Don't have an account?",
+    "signUpLink": "Sign up free",
+    "signupTitle": "Create your account",
+    "username": "Username",
+    "usernameHint": "3–20 characters: letters, numbers, underscores",
+    "signupButton": "Create account",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "checkEmailTitle": "Check your email",
+    "checkEmailBody": "We sent a confirmation link to {email}. Click it to activate your account and get 100,000 FX Coins.",
+    "errorInvalidCredentials": "Incorrect email or password.",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorInvalidUsername": "Username must be 3–20 characters: letters, numbers, underscores only."
   },
   "market": {
     "title": "Market",
@@ -31,7 +47,51 @@
     "shares": "Shares",
     "price": "Price",
     "fairValue": "Fair Value",
-    "dailyChange": "Daily Change"
+    "dailyChange": "Daily Change",
+    "empty": "No players in the market yet. Check back soon.",
+    "noResults": "No players match your search.",
+    "sortChange": "% today",
+    "sortPrice": "Price",
+    "coins": "{amount} FX",
+    "estimatedCost": "Estimated cost",
+    "estimatedProceeds": "Estimated proceeds",
+    "fee": "Fee",
+    "errorMaxOrder": "Max {max} shares per trade.",
+    "bought": "Bought",
+    "sold": "Sold",
+    "executionPrice": "Execution price",
+    "newBalance": "New balance",
+    "yourPosition": "Your position",
+    "avgCost": "Avg cost",
+    "nextMatch": "Next match",
+    "vsOpponent": "vs {opponent}",
+    "goals": "Goals",
+    "assists": "Assists",
+    "yellowCards": "Yellow",
+    "redCards": "Red",
+    "signupCtaTitle": "Want to trade this player?",
+    "signupCtaBody": "Create your free account and get 100,000 FX Coins to build your portfolio.",
+    "signupCtaButton": "Sign up free"
+  },
+  "landing": {
+    "headline": "The World Cup 2026 player market",
+    "tagline": "Buy and sell the stars with 100,000 fully virtual coins. Prices move with the matches in real time.",
+    "startFree": "Start free",
+    "seeMarket": "See the market",
+    "topMovers": "Top movers now",
+    "howItWorks": "How it works",
+    "step1Title": "100,000 FX Coins for you",
+    "step1Body": "Virtual coins, not real money. Buy and sell anytime.",
+    "step2Title": "The pitch moves the prices",
+    "step2Body": "Goals, cards and eliminations move value. So do buyers and sellers.",
+    "step3Title": "Climb the leaderboard",
+    "step3Body": "Win by percentage return, not by finishing first."
+  },
+  "positions": {
+    "GK": "GK",
+    "DEF": "DEF",
+    "MID": "MID",
+    "FWD": "FWD"
   },
   "portfolio": {
     "title": "Portfolio",
@@ -61,6 +121,8 @@
     "volumeCap": "Daily volume cap reached",
     "rateLimited": "Too many trades, please wait",
     "invalidInput": "Invalid input",
-    "playerNotFound": "Player not found"
+    "playerNotFound": "Player not found",
+    "unauthorized": "Please sign in to trade",
+    "tradingPaused": "Trading is currently paused"
   }
 }
