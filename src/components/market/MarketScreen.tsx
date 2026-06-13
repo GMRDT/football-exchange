@@ -1,12 +1,13 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import useSWR from 'swr'
 import { useTranslations } from 'next-intl'
 import { KitAvatar } from '@/components/ui/KitAvatar'
 import { PriceChange } from '@/components/ui/PriceChange'
 import { PlayerRow } from '@/components/market/PlayerRow'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { marketKey } from '@/lib/swr/keys'
 import { fetchMarket, type MarketPlayer } from '@/lib/market/summary'
 
@@ -24,6 +25,17 @@ export function MarketScreen({ initialPlayers }: { initialPlayers: MarketPlayer[
 
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortMode>('change')
+
+  // FIRST MOUNT ONLY: entrance animation for market rows (DESIGN.md §4c).
+  // State starts false; flips to true after all staggered animations complete
+  // (15 rows × 25ms + 250ms duration ≈ 625ms — wait 700ms to be safe).
+  // After that, index={undefined} prevents the class from being applied on
+  // SWR polls. Stable key={player.id} ensures rows never remount on poll.
+  const [entranceDone, setEntranceDone] = useState(false)
+  useEffect(() => {
+    const id = setTimeout(() => setEntranceDone(true), 700)
+    return () => clearTimeout(id)
+  }, [])
 
   const gainers = useMemo(
     () =>
@@ -72,7 +84,7 @@ export function MarketScreen({ initialPlayers }: { initialPlayers: MarketPlayer[
       </header>
 
       {players.length === 0 ? (
-        <p className="px-4 py-12 text-center text-[15px] text-text-muted">{t('empty')}</p>
+        <EmptyState icon="⚽" message={t('empty')} />
       ) : (
         <>
           <MoverSection label={t('topGainers')} movers={gainers} />
@@ -88,11 +100,15 @@ export function MarketScreen({ initialPlayers }: { initialPlayers: MarketPlayer[
           </div>
 
           {list.length === 0 ? (
-            <p className="px-4 py-12 text-center text-[15px] text-text-muted">{t('noResults')}</p>
+            <EmptyState icon="🔍" message={t('noResults')} />
           ) : (
             <div className="border-t border-border">
-              {list.map((player) => (
-                <PlayerRow key={player.id} player={player} />
+              {list.map((player, i) => (
+                <PlayerRow
+                  key={player.id}
+                  player={player}
+                  index={entranceDone ? undefined : i}
+                />
               ))}
             </div>
           )}
@@ -144,7 +160,7 @@ function SortChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-[44px] rounded-xl px-4 text-[13px] font-semibold transition ${
+      className={`min-h-[44px] select-none rounded-xl px-4 text-[13px] font-semibold transition active:scale-[0.98] ${
         active
           ? 'bg-primary text-white'
           : 'border border-border bg-surface text-text-muted active:bg-bg'

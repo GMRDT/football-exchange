@@ -6,7 +6,8 @@ import { useTranslations } from 'next-intl'
 
 /**
  * BottomNav — mobile tab bar (DESIGN.md §8): Market · Portfolio · Leaderboard.
- * Fixed bottom, ≥56px tall, safe-area aware; active tab in primary color.
+ * A 2px primary line slides between tabs (DESIGN.md §4f, transform-based).
+ * select-none prevents text selection on repeated taps.
  */
 
 const TABS = [
@@ -19,9 +20,24 @@ export function BottomNav() {
   const t = useTranslations('nav')
   const pathname = usePathname()
 
+  const activeIndex = TABS.findIndex(
+    ({ href }) => pathname === href || pathname.startsWith(`${href}/`)
+  )
+
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]">
-      <div className="mx-auto flex h-14 max-w-lg items-stretch">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 select-none border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]"
+    >
+      <div className="relative mx-auto flex h-14 max-w-lg items-stretch">
+        {/* Sliding top-line indicator (DESIGN.md §4f) */}
+        {activeIndex >= 0 && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute top-0 h-0.5 w-1/3 bg-primary transition-transform duration-150"
+            style={{ transform: `translateX(${activeIndex * 100}%)` }}
+          />
+        )}
+
         {TABS.map(({ href, key, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`)
           return (
@@ -29,7 +45,7 @@ export function BottomNav() {
               key={key}
               href={href}
               aria-current={active ? 'page' : undefined}
-              className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-[11px] leading-4 font-medium transition ${
+              className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-[11px] leading-4 font-medium transition-colors duration-150 active:opacity-70 ${
                 active ? 'text-primary' : 'text-text-muted'
               }`}
             >

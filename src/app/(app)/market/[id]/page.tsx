@@ -10,6 +10,7 @@ import { PriceChange } from '@/components/ui/PriceChange'
 import { Sparkline } from '@/components/ui/Sparkline'
 import { LocalDate } from '@/components/ui/LocalDate'
 import { TradeSection } from '@/components/trade/TradeSection'
+import { HeroPrice } from '@/components/market/HeroPrice'
 
 /**
  * /market/[id] — public player detail (DESIGN.md §8). Anonymous visitors see
@@ -133,20 +134,16 @@ export default async function PlayerDetailPage({
 
       {/* Price block */}
       <section className="rounded-2xl border border-border bg-surface p-4">
-        <p className="font-display text-[40px] leading-[44px] font-extrabold text-text tabular-nums">
-          {t('coins', { amount: formatCoins(String(player.current_price), locale) })}
-        </p>
+        <HeroPrice currentPrice={String(player.current_price)} />
         <div className="mt-1 flex items-center gap-3">
           <PriceChange pct={pct} />
           <span className="text-[13px] text-text-muted">
             {t('fairValue')}: {formatCoins(String(player.fair_value), locale)}
           </span>
         </div>
-        {sparkPrices.length >= 2 && (
-          <div className="mt-3">
-            <Sparkline prices={sparkPrices} height={120} />
-          </div>
-        )}
+        <div className="mt-3">
+          <Sparkline prices={sparkPrices} height={120} />
+        </div>
       </section>
 
       {/* Stats row */}

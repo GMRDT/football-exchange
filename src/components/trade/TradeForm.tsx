@@ -94,6 +94,8 @@ export function TradeForm({
 
   useEffect(() => {
     if (result?.ok) {
+      // Haptic feedback on trade success — runtime feature-detect (DESIGN.md §4e).
+      if ('vibrate' in navigator) navigator.vibrate(10)
       const id = setTimeout(() => {
         setShares('')
         setResult(null)
@@ -123,6 +125,7 @@ export function TradeForm({
     else if (side === 'sell' && n > sharesHeld) validationError = tErrors('insufficientShares')
   }
 
+  const errorMsg = validationError ?? (result && !result.ok ? result.message : null)
   const canSubmit = shares !== '' && validationError === null && !isSubmitting
 
   async function handleSubmit() {
@@ -168,7 +171,10 @@ export function TradeForm({
   if (result?.ok) {
     return (
       <div className="rounded-2xl border border-border bg-surface p-5 text-center">
-        <div aria-hidden="true" className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-up-soft text-xl text-up">
+        <div
+          aria-hidden="true"
+          className="mx-auto mb-2 flex h-10 w-10 animate-scale-in items-center justify-center rounded-full bg-up-soft text-xl text-up"
+        >
           ✓
         </div>
         <p className="text-[16px] font-semibold text-text">
@@ -186,14 +192,33 @@ export function TradeForm({
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-4">
-      {/* Side toggle */}
-      <div className="flex gap-2" role="group">
-        <SideButton active={side === 'buy'} onClick={() => setSide('buy')}>
+      {/* Sliding Buy/Sell toggle (DESIGN.md §4d): indicator slides via transform */}
+      <div className="relative flex h-11 select-none rounded-xl bg-bg p-0.5" role="group">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0.5 left-0.5 w-[calc(50%-2px)] rounded-lg bg-primary transition-transform duration-150"
+          style={{ transform: side === 'sell' ? 'translateX(100%)' : 'translateX(0)' }}
+        />
+        <button
+          type="button"
+          onClick={() => setSide('buy')}
+          aria-pressed={side === 'buy'}
+          className={`relative z-10 h-full flex-1 rounded-lg text-[15px] font-semibold transition-colors duration-150 ${
+            side === 'buy' ? 'text-white' : 'text-text-muted'
+          }`}
+        >
           {t('buy')}
-        </SideButton>
-        <SideButton active={side === 'sell'} onClick={() => setSide('sell')}>
+        </button>
+        <button
+          type="button"
+          onClick={() => setSide('sell')}
+          aria-pressed={side === 'sell'}
+          className={`relative z-10 h-full flex-1 rounded-lg text-[15px] font-semibold transition-colors duration-150 ${
+            side === 'sell' ? 'text-white' : 'text-text-muted'
+          }`}
+        >
           {t('sell')}
-        </SideButton>
+        </button>
       </div>
 
       <input
@@ -213,27 +238,26 @@ export function TradeForm({
             <dt className="text-text-muted">
               {side === 'buy' ? t('estimatedCost') : t('estimatedProceeds')}
             </dt>
-            <dd className="font-semibold text-text tabular-nums">
+            <dd className="tnum font-semibold text-text">
               {t('coins', { amount: formatCoins(net, locale) })}
             </dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-text-muted">{t('fee')}</dt>
-            <dd className="text-text-muted tabular-nums">
+            <dd className="tnum text-text-muted">
               {t('coins', { amount: formatCoins(fee, locale) })}
             </dd>
           </div>
         </dl>
       )}
 
-      {validationError && (
-        <p className="mt-3 rounded-lg bg-down-soft px-3 py-2 text-[13px] text-down">
-          {validationError}
-        </p>
-      )}
-      {result && !result.ok && (
-        <p className="mt-3 rounded-lg bg-down-soft px-3 py-2 text-[13px] text-down">
-          {result.message}
+      {/* Error message: key restarts slide-down animation on each new error */}
+      {errorMsg && (
+        <p
+          key={errorMsg}
+          className="mt-3 animate-slide-down-in rounded-lg bg-down-soft px-3 py-2 text-[13px] text-down"
+        >
+          {errorMsg}
         </p>
       )}
 
@@ -241,35 +265,10 @@ export function TradeForm({
         type="button"
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className="mt-4 h-11 w-full rounded-xl bg-primary text-[15px] font-semibold text-white transition hover:bg-primary-pressed active:bg-primary-pressed disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 h-11 w-full select-none rounded-xl bg-primary text-[15px] font-semibold text-white transition hover:bg-primary-pressed active:scale-[0.98] active:bg-primary-pressed disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? '…' : side === 'buy' ? t('buy') : t('sell')}
       </button>
     </div>
-  )
-}
-
-function SideButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`h-11 flex-1 rounded-xl text-[15px] font-semibold transition ${
-        active
-          ? 'bg-primary text-white'
-          : 'border border-border bg-surface text-text-muted active:bg-bg'
-      }`}
-    >
-      {children}
-    </button>
   )
 }

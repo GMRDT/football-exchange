@@ -1,10 +1,9 @@
 import { useId } from 'react'
 
 /**
- * Sparkline — minimal SVG line + soft gradient fill underneath (DESIGN.md §5).
- * No axes, no labels. Line color = sign of the period (last vs first price):
- * up token if the period closed higher, down token otherwise. Candlesticks
- * are prohibited by the design system; this stays a single polyline.
+ * Sparkline — minimal SVG line + soft gradient fill (DESIGN.md §5).
+ * No axes, no labels. Line color = sign of the period (last vs first).
+ * Flat dashed line when fewer than 2 price points (no error, no null).
  */
 export function Sparkline({
   prices,
@@ -17,12 +16,33 @@ export function Sparkline({
 }) {
   const gradientId = useId()
 
-  if (prices.length < 2) return null
+  if (prices.length < 2) {
+    return (
+      <svg
+        width="100%"
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        role="presentation"
+        aria-hidden="true"
+      >
+        <line
+          x1={4}
+          y1={height / 2}
+          x2={width - 4}
+          y2={height / 2}
+          stroke="var(--color-border)"
+          strokeWidth="1.5"
+          strokeDasharray="4 4"
+        />
+      </svg>
+    )
+  }
 
   const min = Math.min(...prices)
   const max = Math.max(...prices)
-  const range = max - min || 1 // flat series → centered line
-  const pad = 4 // keep the stroke inside the viewBox
+  const range = max - min || 1
+  const pad = 4
 
   const points = prices.map((price, i) => {
     const x = pad + (i / (prices.length - 1)) * (width - pad * 2)

@@ -106,14 +106,29 @@ price, high/low as discrete points. Candlesticks are prohibited.
 **Fair value is progressive disclosure:** hidden by default; a "Show fair value" chip
 overlays a dotted gray line. Do not surface it in onboarding or default views.
 
-## 6. Microinteractions (exactly these three)
+## 6. Microinteractions
 
-1. **Price pulse:** on polling update, number transitions smoothly and its background
-   flashes 400ms in `up-soft`/`down-soft`.
-2. **Trade confirmed:** simple animated check + the new position appears. No confetti.
-3. **Skeletons** on every list load.
+All seven are implemented. Respect `prefers-reduced-motion` in all animation.
 
-Respect `prefers-reduced-motion` in all animation.
+1. **Price pulse (§4a):** on every SWR poll update, the `PlayerRow` price cell and Player
+   Detail hero price background flash 400ms in `up-soft` / `down-soft`.
+2. **Hero count animation (§4b):** Player Detail hero price smooths over 300ms via rAF
+   (cubic ease-out) when the page refreshes after a trade. Client component `HeroPrice` +
+   `useCountAnimation` hook (`src/hooks/useCountAnimation.ts`).
+3. **List entrance (§4c):** Market rows fade-in + translateY(8px), 25ms stagger per row,
+   first mount only. SWR polls on stable `key={player.id}` elements — animation never
+   replays on 30s poll.
+4. **TradeForm toggle (§4d):** Buy/Sell indicator slides via `transform`, not background
+   swap. Submit button `scale(0.98)` on `:active`. Success checkmark scale-in 200ms. Error
+   message slides down 150ms; `key={error}` restarts animation on each new error.
+5. **Haptic (§4e):** `navigator.vibrate(10)` on trade success. Feature-detected at runtime;
+   safe on desktop.
+6. **Bottom nav indicator (§4f):** A 2px primary line slides between the three tabs via
+   `translateX`. Icon + label color transition 150ms.
+7. **Skeletons:** `SkeletonRow` + `SkeletonPlayerDetail` on every list/detail load.
+   Full-screen spinners are prohibited; button-level spinners only for TradeForm submit.
+
+Touch targets: all tappable elements ≥ 44px. Visible `:active` state on all buttons.
 
 ## 7. Voice & microcopy
 
