@@ -103,7 +103,13 @@
     "cash": "Cash",
     "totalValue": "Total Value",
     "return": "Return (%)",
-    "share": "Share"
+    "share": "Share",
+    "empty": "Your portfolio is empty",
+    "emptyCta": "Explore the market",
+    "players": "Your Players ({count})",
+    "sharesAbbr": "sh",
+    "shareText": "My {appName} return: {pct} · {value} {ticker}",
+    "shareCopied": "Copied to clipboard"
   },
   "leaderboard": {
     "title": "Leaderboard",

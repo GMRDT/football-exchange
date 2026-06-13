@@ -11,11 +11,10 @@ import { useTranslations } from 'next-intl'
  */
 
 const TABS = [
-  // route exists → normal (default) prefetch
+  // routes exist → normal (default) prefetch
   { href: '/market', key: 'market', icon: MarketIcon, prefetch: undefined },
-  // TODO(F4.x): quitar prefetch={false} al crear esta ruta — restaura navegación instantánea.
-  { href: '/portfolio', key: 'portfolio', icon: PortfolioIcon, prefetch: false },
-  // TODO(F4.x): quitar prefetch={false} al crear esta ruta — restaura navegación instantánea.
+  { href: '/portfolio', key: 'portfolio', icon: PortfolioIcon, prefetch: undefined },
+  // TODO(F4.5): quitar prefetch={false} al crear esta ruta — restaura navegación instantánea.
   { href: '/leaderboard', key: 'leaderboard', icon: LeaderboardIcon, prefetch: false },
 ] as const
 
