@@ -17,7 +17,11 @@ export default async function LandingPage() {
   const tCommon = await getTranslations('common')
   const tAuth = await getTranslations('auth')
 
-  const steps = [t('step1'), t('step2'), t('step3')]
+  const steps = [
+    { title: t('step1Title'), body: t('step1Body') },
+    { title: t('step2Title'), body: t('step2Body') },
+    { title: t('step3Title'), body: t('step3Body') },
+  ]
 
   return (
     <div className="mx-auto flex min-h-screen max-w-lg flex-col px-4">
@@ -68,14 +72,19 @@ export default async function LandingPage() {
           </h2>
           <ol className="mt-3 flex flex-col gap-3">
             {steps.map((step, i) => (
-              <li key={step} className="flex items-center gap-3">
+              <li key={step.title} className="flex items-start gap-3">
                 <span
                   aria-hidden="true"
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-white tabular-nums"
                 >
                   {i + 1}
                 </span>
-                <span className="text-[15px] leading-5 text-text">{step}</span>
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-[15px] leading-5 font-semibold text-text">
+                    {step.title}
+                  </span>
+                  <span className="text-[13px] leading-4 text-text-muted">{step.body}</span>
+                </span>
               </li>
             ))}
           </ol>

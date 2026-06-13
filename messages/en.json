@@ -80,9 +80,12 @@
     "seeMarket": "See the market",
     "topMovers": "Top movers now",
     "howItWorks": "How it works",
-    "step1": "Get 100,000 FX Coins — free and fully virtual",
-    "step2": "Buy and sell players as the matches move their prices",
-    "step3": "Climb the leaderboard"
+    "step1Title": "100,000 FX Coins for you",
+    "step1Body": "Virtual coins, not real money. Buy and sell anytime.",
+    "step2Title": "The pitch moves the prices",
+    "step2Body": "Goals, cards and eliminations move value. So do buyers and sellers.",
+    "step3Title": "Climb the leaderboard",
+    "step3Body": "Win by percentage return, not by finishing first."
   },
   "positions": {
     "GK": "GK",
