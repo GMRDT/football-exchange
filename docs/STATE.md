@@ -1,5 +1,9 @@
 # Football Exchange — State Audit
 
+> **Status:** snapshot from Jun 12 ~22:00. F3.5 (live engine test) has since completed —
+> see `docs/F3_5_REPORT.md`. The local DB figures below (matches/price_history/profiles = 0)
+> were captured before that test inserted fixture 1489370; they are point-in-time, not regenerated.
+
 **Generated:** 2026-06-12 · branch `main` · pre-launch (F4 in progress)
 **DB figures below are the LOCAL stack** (`.env.local` → `http://127.0.0.1:54321`),
 which diverges from production — see *Database state* and *Known bugs / debt*.

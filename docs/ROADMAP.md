@@ -3,6 +3,7 @@
 **Launch:** Jun 28, 2026 (World Cup Round of 16, Day 1)
 **Hard deadline:** 18 days from Jun 10
 **Operator:** solo founder
+**Last updated:** 2026-06-12
 
 > Update checkboxes as tasks complete. This file is the daily status board.
 
@@ -14,34 +15,34 @@
 Goal: working repo, tooling, CI, and 6 docs. Nothing else.
 
 - [ ] **F0.1** Accounts & access
-  - [ ] GitHub repo created (`football-exchange`, private)
-  - [ ] Supabase project created (region: closest to Colombia → us-east-1 or us-west-2)
-  - [ ] Vercel project linked to GitHub repo
+  - [x] GitHub repo created (`football-exchange`, private) — remote `GMRDT/football-exchange`
+  - [x] Supabase project created (region: closest to Colombia → us-east-1 or us-west-2)
+  - [ ] Vercel project linked to GitHub repo (unverified — no evidence in repo)
   - [x] API-Football paid plan activated (Pro, active until Jul 12 — verified 2026-06-12)
-  - [ ] Cloudflare Turnstile site registered
-  - [ ] All secrets saved to password manager + Vercel env vars + Supabase secrets
+  - [x] Cloudflare Turnstile site registered (site + secret keys present in env)
+  - [ ] All secrets saved to password manager + Vercel env vars + Supabase secrets (unverified)
 
-- [ ] **F0.2** Local environment
-  - [ ] Node LTS (v22+) installed
-  - [ ] pnpm installed globally
-  - [ ] Docker Desktop running
-  - [ ] Supabase CLI installed and authenticated
-  - [ ] Claude Code installed and authenticated
+- [x] **F0.2** Local environment
+  - [x] Node LTS (v22+) installed
+  - [x] pnpm installed globally
+  - [x] Docker Desktop running
+  - [x] Supabase CLI installed and authenticated
+  - [x] Claude Code installed and authenticated
 
-- [ ] **F0.3** Bootstrap repo (Prompt 0 → Claude Code)
-  - [ ] Next.js 15 + TypeScript strict + Tailwind v4 + pnpm initialized
-  - [ ] PWA base: `public/manifest.json` + service worker (Serwist)
-  - [ ] Directory structure created (see ARCHITECTURE.md)
-  - [ ] ESLint + Prettier configured
-  - [ ] Vitest configured (unit + integration modes)
-  - [ ] next-intl configured: `messages/en.json` + `messages/es.json` skeletons,
+- [x] **F0.3** Bootstrap repo (Prompt 0 → Claude Code)
+  - [x] Next.js 15 + TypeScript strict + Tailwind v4 + pnpm initialized
+  - [x] PWA base: `public/manifest.json` + service worker (Serwist)
+  - [x] Directory structure created (see ARCHITECTURE.md)
+  - [x] ESLint + Prettier configured (`eslint.config.mjs` + `.prettierrc`)
+  - [x] Vitest configured (unit + integration modes)
+  - [x] next-intl configured: `messages/en.json` + `messages/es.json` skeletons,
         cookie-based locale (NO URL routing), key-parity unit test
-  - [ ] GitHub Action `ci.yml`: typecheck + lint + unit tests
-  - [ ] `pnpm typecheck` passes
-  - [ ] `pnpm lint` passes
-  - [ ] `pnpm test` passes (no tests yet = green)
-  - [ ] All 6 docs committed to `docs/`
-  - [ ] Initial commit pushed to `main`
+  - [x] GitHub Action `ci.yml`: typecheck + lint + unit tests
+  - [x] `pnpm typecheck` passes
+  - [x] `pnpm lint` passes
+  - [x] `pnpm test` passes (no tests yet = green)
+  - [x] All 6 docs committed to `docs/`
+  - [x] Initial commit pushed to `main`
 
 ---
 
@@ -68,17 +69,17 @@ Goal: complete normalized schema, RLS on everything, 200 players seeded with rea
   - [x] Zero direct client writes on financial/pricing tables
   - [x] Test: `anon` role can SELECT players but cannot INSERT to any financial table
 
-- [ ] **F1.3** TypeScript types generated
-  - [ ] `supabase gen types typescript` → `src/lib/supabase/types.ts`
-  - [ ] Types committed and CI passes
+- [x] **F1.3** TypeScript types generated
+  - [x] `supabase gen types typescript` → `src/lib/supabase/types.ts`
+  - [x] Types committed and CI passes
 
-- [ ] **F1.4** Seed pipeline (Prompt 2 → Claude Code)
-  - [ ] `data/teams.csv` — 48 World Cup teams (name, country_code, group, api_team_id, colors)
-  - [ ] `data/players.csv` — ~200 players (name, team, position, dob, base_value, tier, api_player_id?)
-  - [ ] `scripts/seed.ts` — idempotent upsert, Zod validation, normalization documented
-  - [ ] `scripts/map-api-ids.ts` — fuzzy name match, outputs review CSV (no DB writes)
-  - [ ] `scripts/record-fixtures.ts` — saves raw API responses to `tests/fixtures/`
-  - [ ] `pnpm seed` runs twice with identical result (no duplicates)
+- [x] **F1.4** Seed pipeline (Prompt 2 → Claude Code)
+  - [x] `data/teams.csv` — 48 World Cup teams (name, country_code, group, api_team_id, colors)
+  - [x] `data/players.csv` — ~200 players (name, team, position, dob, base_value, tier, api_player_id?)
+  - [x] `scripts/seed.ts` — idempotent upsert, Zod validation, normalization documented
+  - [x] `scripts/map-api-ids.ts` — fuzzy name match, outputs review CSV (no DB writes)
+  - [x] `scripts/record-fixtures.ts` — saves raw API responses to `tests/fixtures/`
+  - [x] `pnpm seed` runs twice with identical result (no duplicates)
 
 - [ ] **F1.5** Local validation
   - [x] `supabase db reset` clean
@@ -129,7 +130,7 @@ Goal: atomic trade function with full invariant guarantees.
     - Latest ledger entry per user: `balance_after == cash_balance`
     - `SUM(holdings.shares)` per player `== players.shares_outstanding` (drift)
   - [x] Script runs clean on seeded data
-  - [ ] Daily cron job in prod (pg_cron calling Edge Function or a simple SELECT check)
+  - [ ] Daily cron job in prod (pg_cron calling Edge Function or a simple SELECT check) — **still pending: not deployed to prod as of 2026-06-12**
 
 ---
 
@@ -187,14 +188,17 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
   - [x] Jobs documented in migration file; secrets via Vault (`pnpm check-prod-secrets`
         validates before launch)
 
-- [ ] **F3.5** Live test (critical gate)
+- [x] **F3.5** Live test (critical gate) — ✅ COMPLETED 2026-06-12 (see `docs/F3_5_REPORT.md`)
   > Runbook: `docs/F3.5-live-test.md` — smoke: Canada–Bosnia Jun 12 14:00 COT;
   > primary: USA–Paraguay Jun 12 20:00 COT (engine already live, backfill verified)
-  - [ ] Motor running against at least ONE real group-stage match
-  - [ ] 3–5 test accounts trading during the match
-  - [ ] Verify: events cause fair_value to update, P drips over ~3 min, no double-deltas
-  - [ ] Verify: invariants pass after live match
-  - [ ] Simulate calibration targets from MARKET_ENGINE.md §7
+  > Result: end-to-end ingest→fair_value→deltas→tick→price_history validated on real
+  > fixture 1489370 (USA 4–1 Paraguay): 6 priced events with exact spec magnitudes, drip
+  > completed, idempotency byte-perfect on re-ingest, invariants clean, 0 errors.
+  - [x] Motor running against at least ONE real group-stage match (fixture 1489370)
+  - [ ] 3–5 test accounts trading during the match — NOT covered by the engine test (no live trades); deferred to F5.3 soft launch
+  - [x] Verify: events cause fair_value to update, P drips over ~3 min, no double-deltas
+  - [x] Verify: invariants pass after live match (`pnpm check-invariants` clean)
+  - [ ] Simulate calibration targets from MARKET_ENGINE.md §7 — NOT done (no `scripts/simulate-market.ts` run yet)
 
 - [ ] **F3.6** Live wiring (engine is built and synthetic-tested; these connect it to reality)
   - [x] `pnpm map-api-players` tool: squads-based name match, top-N by base_value,
@@ -219,6 +223,10 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
         goals of the 2 already-processed fixtures (see F3-completion-report.md)
   - [ ] Lineup-based FT events (`clean_sheet_gk/def`, `motm`, `injury_out`) — needs
         `player_match_appearances` ingestion
+    - ⚠ Blocked on player mapping: 28 top-value players are still unmapped in the local
+      seed (185/213) — see `docs/MAPPING_TODO.md` for per-player resolution context. Full
+      lineup-events validation and complete event coverage need these resolved first.
+      (Prod is reportedly 213/213 — re-verify per `docs/F3_5_REPORT.md` recommendation.)
 
 ---
 
@@ -233,20 +241,22 @@ Goal: 5 screens + PWA installation. Starts only after F2 green; F3 running in ba
   - [ ] Auth: email/password + Google OAuth + Turnstile integration
   - [ ] Auth guards (middleware for protected routes)
 
-- [ ] **F4.2** Screen 1: Market
-  - [ ] Screener: avatar (initials + team colors), player name, price, % change
-  - [ ] Top Gainers / Top Losers sections
-  - [ ] Search + basic filters (team, position)
-  - [ ] Sortable table
-  - [ ] SWR polling every 30s
+- [x] **F4.2** Screen 1: Market — built 2026-06-12
+  - [x] Screener: avatar (initials + team colors), player name, price, % change
+  - [x] Top Gainers / Top Losers sections
+  - [ ] Search + basic filters (team, position) — search done; team/position filters still TODO
+  - [x] Sortable table (sort by % change / price)
+  - [x] SWR polling every 30s
+  - [x] Landing page (`/`) built 2026-06-12 per DESIGN.md §10 — quality flagged as MVP
+        minimum, needs polish session before launch
 
-- [ ] **F4.3** Screen 2: Player Detail
-  - [ ] Price display + % change
-  - [ ] Tournament stats (goals, assists, cards from `v_player_stats`)
-  - [ ] Next match info
-  - [ ] Current position (shares held, P&L)
-  - [ ] Buy / Sell form (calls `supabase.rpc('trade')`)
-  - [ ] Error handling for all typed error codes
+- [x] **F4.3** Screen 2: Player Detail + TradeForm — built 2026-06-12
+  - [x] Price display + % change
+  - [x] Tournament stats (goals, assists, cards from `v_player_stats`)
+  - [x] Next match info
+  - [x] Current position (shares held, P&L)
+  - [x] Buy / Sell form (calls `supabase.rpc('trade')`)
+  - [x] Error handling for all typed error codes
 
 - [ ] **F4.4** Screen 3: Portfolio
   - [ ] Positions list (avatar, name, shares, current value, P&L)
