@@ -8,3 +8,5 @@ export const marketKey = () => '/api/market' as const
 export const playerKey = (id: string) => `player:${id}` as const
 
 export const portfolioKey = () => '/api/portfolio' as const
+
+export const leaderboardKey = () => '/api/leaderboard' as const
