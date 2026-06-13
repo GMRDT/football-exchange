@@ -11,9 +11,12 @@ import { useTranslations } from 'next-intl'
  */
 
 const TABS = [
-  { href: '/market', key: 'market', icon: MarketIcon },
-  { href: '/portfolio', key: 'portfolio', icon: PortfolioIcon },
-  { href: '/leaderboard', key: 'leaderboard', icon: LeaderboardIcon },
+  // route exists → normal (default) prefetch
+  { href: '/market', key: 'market', icon: MarketIcon, prefetch: undefined },
+  // TODO(F4.x): quitar prefetch={false} al crear esta ruta — restaura navegación instantánea.
+  { href: '/portfolio', key: 'portfolio', icon: PortfolioIcon, prefetch: false },
+  // TODO(F4.x): quitar prefetch={false} al crear esta ruta — restaura navegación instantánea.
+  { href: '/leaderboard', key: 'leaderboard', icon: LeaderboardIcon, prefetch: false },
 ] as const
 
 export function BottomNav() {
@@ -38,12 +41,13 @@ export function BottomNav() {
           />
         )}
 
-        {TABS.map(({ href, key, icon: Icon }) => {
+        {TABS.map(({ href, key, icon: Icon, prefetch }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`)
           return (
             <Link
               key={key}
               href={href}
+              prefetch={prefetch}
               aria-current={active ? 'page' : undefined}
               className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 text-[11px] leading-4 font-medium transition-colors duration-150 active:opacity-70 ${
                 active ? 'text-primary' : 'text-text-muted'
