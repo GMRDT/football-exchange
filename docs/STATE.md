@@ -1,4 +1,4 @@
-# Football Exchange — State Audit
+# Golcap — State Audit
 
 > **Status:** snapshot from Jun 12 ~22:00. F3.5 (live engine test) has since completed —
 > see `docs/F3_5_REPORT.md`. The local DB figures below (matches/price_history/profiles = 0)
@@ -24,7 +24,7 @@ Everything physically present under `src/app/`. "Screenshot status" reflects the
 | `/signup` (`(auth)/signup/page.tsx`) | Username/email/password form, then a "check your email" confirmation stage | No | **Works** (local mail lands in Mailpit) |
 | `/auth/callback` (`(auth)/auth/callback/route.ts`) | Route handler — exchanges OAuth/email code for a session, redirects to `/market` (or `/login` on failure) | No | Not a screen (works) |
 | `/api/market` (`api/market/route.ts`) | JSON market snapshot (`{ players }`) polled by SWR every 30s; anon RLS-public read | No | Not a screen — returns valid JSON |
-| `/icon`, `/apple-icon` (`icon.tsx`, `apple-icon.tsx`) | Generated PWA icons — blue square, white "FX" | No | Works (image responses) |
+| `/icon`, `/apple-icon` (`icon.tsx`, `apple-icon.tsx`) | Generated PWA icons — blue square, white "GC" | No | Works (image responses) |
 
 Loading skeletons exist for `/market` (`market/loading.tsx`) and `/market/[id]`
 (`market/[id]/loading.tsx`).

@@ -1,5 +1,5 @@
 /**
- * formatCoins — formats a FX coin amount with locale-aware thousand separators.
+ * formatCoins — formats a GC coin amount with locale-aware thousand separators.
  * Monetary values arrive as strings from the DB (NUMERIC → string) to avoid
  * IEEE-754 precision loss; pass them directly here.
  */

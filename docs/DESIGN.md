@@ -1,4 +1,4 @@
-# Football Exchange — Design System & UX Direction
+# Golcap — Design System & UX Direction
 
 **Status:** approved by founder (Jun 12). This document is mandatory reading for every
 F4 session, alongside CLAUDE.md. If a UI decision is not covered here, derive it from
@@ -140,9 +140,13 @@ case, no unexplained financial jargon. All strings live in `messages/en.json` +
 |---|---|---|---|
 | Buy action | Buy | Comprar | Trade, Stake, Bet |
 | Player set | Portfolio | Portafolio | Team, Squad, Lineup |
-| Currency | FX Coins | FX Coins | $, USD, money |
+| Currency | GC Coins | GC Coins | $, USD, Gold, money |
 | Movement | +4.2% today | +4.2% hoy | "WIN NOW!" |
 | Balance | Cash | Efectivo | Available to bet |
+
+> Currency is centralized in two i18n keys: `currency.ticker` = "GC" (shown next to
+> amounts, e.g. `12,450 GC`) and `currency.name` = "Golcap Coins" (prose, e.g.
+> "100,000 Golcap Coins"). A future rebrand edits those two keys only.
 
 Errors explain what happened and how to fix it; they don't apologize and are never
 vague. Button label = resulting toast verb ("Buy" → "Bought").
@@ -150,7 +154,7 @@ vague. Button label = resulting toast verb ("Buy" → "Bought").
 ## 8. Navigation & responsive
 
 - **Mobile (<768):** bottom nav, 3 tabs — Market · Portfolio · Leaderboard (per spec).
-  Activity = bell icon in header with unread badge. Header: logo left, `Cash: 87,550 FX`
+  Activity = bell icon in header with unread badge. Header: logo left, `Cash: 87,550 GC`
   center-right, bell right.
 - **Desktop (≥1024):** bottom nav dies; horizontal top nav: logo · Market · Portfolio ·
   Leaderboard · [spacer] · Cash · bell · avatar. Content `max-width: 1120px` centered.
@@ -165,7 +169,7 @@ of players, prices, leaderboard. Therefore:
   `/player/*`, `/leaderboard`
 - **Auth required:** `/portfolio`, `/activity`
 - Tapping **Buy/Sell** (or the bell) without a session opens a contextual signup sheet:
-  "Create your free account and get 100,000 FX Coins". Trade protection lives in the
+  "Create your free account and get 100,000 Golcap Coins". Trade protection lives in the
   component + RPC (server enforces auth regardless), not in middleware.
 
 The landing's Top Movers block uses **live anonymous reads** — the best possible demo.
@@ -176,7 +180,7 @@ The landing's Top Movers block uses **live anonymous reads** — the best possib
 0s   Landing: headline + live market block
 10s  "Start free" → Google OAuth 1-tap (or email)
 20s  2 explainer cards (skippable):
-     Card 1 "100,000 FX Coins for you" — virtual coins, not real money,
+     Card 1 "100,000 Golcap Coins for you" — virtual coins, not real money,
             buy & sell anytime — no lineups, no gameweeks.
      Card 2 "The pitch moves the prices" — goals, cards and eliminations
             move value; so do buyers and sellers. Buy low, sell high.
@@ -196,7 +200,7 @@ What a user must grasp in 5 seconds: *a World Cup player market, virtual money, 
 and I can see it right now.*
 ```
 ┌─────────────────────────────────────────────┐
-│  ⚽ Football Exchange          [Sign in]     │
+│  ⚽ Golcap                     [Sign in]     │
 ├─────────────────────────────────────────────┤
 │   The World Cup 2026 player market          │
 │   Buy and sell the stars with 100,000       │
@@ -209,7 +213,7 @@ and I can see it right now.*
 │   │  ▐█▌ Bellingham   9,800  ▲2.8%  │       │
 │   │  ▐█▌ Son          5,100  ▼3.1%  │       │
 │   └─────────────────────────────────┘       │
-│   How it works: 1 Get 100,000 FX →          │
+│   How it works: 1 Get 100,000 GC →          │
 │   2 Buy players → 3 Climb the ranking       │
 └─────────────────────────────────────────────┘
 ```
@@ -217,7 +221,7 @@ and I can see it right now.*
 ### Market — mobile
 ```
 ┌─────────────────────────────────┐
-│ ⚽ FX        Cash: 100,000   🔔  │
+│ ⚽ GC        Cash: 100,000   🔔  │
 │ 🔍 Search player or team        │
 │ TOP MOVERS TODAY                │
 │ [▐█▌Mbp ▲4.2%][▐█▌Bel ▲2.8%] →  │
@@ -233,7 +237,7 @@ and I can see it right now.*
 
 ### Market — desktop (≥1024)
 ```
-│ ⚽ FX  Market Portfolio Ranking      Cash: 100,000  🔔 (G) │
+│ ⚽ GC  Market Portfolio Ranking      Cash: 100,000  🔔 (G) │
 │ TOP MOVERS TODAY: [cards row]                              │
 │ 🔍 Search   [Team ▾][Pos ▾]            Sort: % today ▾     │
 │ Player        Team     Pos  Price    Today    7D    24h    │
@@ -246,12 +250,12 @@ lost. Desktop: 2 columns, right TradeSheet sticky.
 ```
 │ ←  Kylian Mbappé            🔔  │   Sheet on [Buy]:
 │    ▐█▌ France · Forward         │   │ Buy Mbappé              │
-│    12,450 FX   ▲ +4.2% today    │   │ Quantity: [5] shares    │
+│    12,450 GC   ▲ +4.2% today    │   │ Quantity: [5] shares    │
 │    ╱╲  ╱╲╱╲ line chart          │   │ [1][5][10][Max]         │
-│    24H · 7D · Tournament        │   │ Price/share 12,512 FX   │
+│    24H · 7D · Tournament        │   │ Price/share 12,512 GC   │
 │    [○ Show fair value]          │   │ (includes 1% spread)    │
-│ ⚠ Live match — spread 2.5%      │   │ Total      62,560 FX    │
-│ WHY IT MOVED TODAY              │   │ Cash left  37,440 FX    │
+│ ⚠ Live match — spread 2.5%      │   │ Total      62,560 GC    │
+│ WHY IT MOVED TODAY              │   │ Cash left  37,440 GC    │
 │ ⚽ Goal (62') .......... +6.0%  │   │ [   Confirm buy   ]     │
 │ 📊 Market .............. −1.8%  │
 │ YOUR POSITION / STATS / NEXT    │
@@ -261,7 +265,7 @@ lost. Desktop: 2 columns, right TradeSheet sticky.
 ### Portfolio — mobile
 ```
 │ Your portfolio              🔔  │
-│ 112,300 FX        ▲ +12.3%      │
+│ 112,300 GC        ▲ +12.3%      │
 │ total value        return       │
 │ Cash: 37,440      [Share 📤]    │
 │ YOUR PLAYERS (3)                │

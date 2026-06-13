@@ -1,4 +1,4 @@
-# Football Exchange — Technical Roadmap
+# Golcap — Technical Roadmap
 
 **Launch:** Jun 28, 2026 (World Cup Round of 16, Day 1)
 **Hard deadline:** 18 days from Jun 10
@@ -345,7 +345,7 @@ Do NOT build before launch. Add to backlog only.
 ## Phase 2 (🔵 — after validation, post Jul 19)
 - Real money (Stripe, KYC, +18 verification)
 - Paid contests (rake model)
-- FX Pro subscription
+- Golcap Pro subscription
 - Dynamic spread
 - Premium data feed
 - Club football season (bridge: Jul 19 → Aug 22)

@@ -1,6 +1,6 @@
 {
-  "name": "Football Exchange",
-  "short_name": "FX",
+  "name": "Golcap",
+  "short_name": "Golcap",
   "description": "Trade virtual football player shares. World Cup 2026.",
   "start_url": "/",
   "display": "standalone",

@@ -18,7 +18,7 @@ import { HeroPrice } from '@/components/market/HeroPrice'
  * trade() RPC enforces auth server-side regardless.
  *
  * NUMERIC columns arrive as JSON numbers from PostgREST; values here are
- * display-only (the engine never trusts the client), and FX magnitudes
+ * display-only (the engine never trusts the client), and GC magnitudes
  * (≤ ~1e7 with 6 dp) are exactly representable in a double.
  */
 export default async function PlayerDetailPage({
@@ -32,6 +32,7 @@ export default async function PlayerDetailPage({
   const supabase = await getSupabaseServerClient()
   const t = await getTranslations('market')
   const tPositions = await getTranslations('positions')
+  const tCurrency = await getTranslations('currency')
   const locale = await getLocale()
 
   const { data: player } = await supabase
@@ -184,7 +185,7 @@ export default async function PlayerDetailPage({
             </div>
             <div className="flex flex-col items-end gap-0.5">
               <span className="text-[15px] font-semibold text-text tabular-nums">
-                {t('coins', { amount: formatCoins(unrealizedPnl, locale) })}
+                {t('coins', { amount: formatCoins(unrealizedPnl, locale), ticker: tCurrency('ticker') })}
               </span>
               <PriceChange pct={unrealizedPct} />
             </div>
@@ -206,7 +207,9 @@ export default async function PlayerDetailPage({
           <h2 className="font-display text-[20px] leading-7 font-bold text-text">
             {t('signupCtaTitle')}
           </h2>
-          <p className="mt-1 text-[15px] leading-6 text-text-muted">{t('signupCtaBody')}</p>
+          <p className="mt-1 text-[15px] leading-6 text-text-muted">
+            {t('signupCtaBody', { currencyName: tCurrency('name') })}
+          </p>
           <Link
             href="/signup"
             className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-[15px] font-semibold text-white transition hover:bg-primary-pressed active:bg-primary-pressed"

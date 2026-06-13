@@ -78,6 +78,7 @@ export function TradeForm({
   const t = useTranslations('market')
   const tErrors = useTranslations('errors')
   const tCommon = useTranslations('common')
+  const ticker = useTranslations('currency')('ticker')
   const locale = useLocale()
 
   const [side, setSide] = useState<Side>('buy')
@@ -181,10 +182,10 @@ export function TradeForm({
           {side === 'buy' ? t('bought') : t('sold')}
         </p>
         <p className="mt-1 text-[13px] text-text-muted">
-          {t('executionPrice')}: {t('coins', { amount: formatCoins(result.execution_price, locale) })}
+          {t('executionPrice')}: {t('coins', { amount: formatCoins(result.execution_price, locale), ticker })}
         </p>
         <p className="text-[13px] text-text-muted">
-          {t('newBalance')}: {t('coins', { amount: formatCoins(result.new_balance, locale) })}
+          {t('newBalance')}: {t('coins', { amount: formatCoins(result.new_balance, locale), ticker })}
         </p>
       </div>
     )
@@ -239,13 +240,13 @@ export function TradeForm({
               {side === 'buy' ? t('estimatedCost') : t('estimatedProceeds')}
             </dt>
             <dd className="tnum font-semibold text-text">
-              {t('coins', { amount: formatCoins(net, locale) })}
+              {t('coins', { amount: formatCoins(net, locale), ticker })}
             </dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-text-muted">{t('fee')}</dt>
             <dd className="tnum text-text-muted">
-              {t('coins', { amount: formatCoins(fee, locale) })}
+              {t('coins', { amount: formatCoins(fee, locale), ticker })}
             </dd>
           </div>
         </dl>

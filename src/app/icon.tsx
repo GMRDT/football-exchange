@@ -26,7 +26,7 @@ export default function AppIcon() {
             fontFamily: 'sans-serif',
           }}
         >
-          FX
+          GC
         </span>
       </div>
     ),

@@ -1,4 +1,4 @@
-# Football Exchange — Market Engine Specification
+# Golcap — Market Engine Specification
 
 This document is the single source of truth for all pricing logic.
 If the SQL implementation and the TypeScript implementation ever diverge, this doc wins.
@@ -34,7 +34,7 @@ dynamic — buying when P < V is rewarded when the market corrects.
 ```
 base_value = round(raw_market_value_EUR / normalization_divisor)
 ```
-Where `normalization_divisor` maps real values to the game's price scale (~1_000–500_000 FX coins).
+Where `normalization_divisor` maps real values to the game's price scale (~1_000–500_000 GC coins).
 The normalization table lives in `data/normalization.md` (created during seed phase).
 
 ### 1.2 Event-driven updates
@@ -134,7 +134,7 @@ Where `L_tier` and `k_d_tier` depend on `players.liquidity_tier`:
 
 These live in `market_params.tier_params` (jsonb). Change without deploying.
 
-**Minimum price:** `max(P_new, 100)` — prices cannot go below 100 FX coins.
+**Minimum price:** `max(P_new, 100)` — prices cannot go below 100 GC coins.
 
 ### 2.2 Event-driven price drip (gradual P movement)
 Events do NOT move P instantly (prevents TV arbitrage: polling lag is 30–60s).
@@ -249,7 +249,7 @@ All checked in both `trade()` RPC and `tick()` function.
 |---|---|---|
 | Max price change per single event | **±25%** | per event delta |
 | Max price change per day (all causes) | **±50%** | rolling 24h from price_history |
-| Min price | **100 FX coins** | absolute |
+| Min price | **100 GC coins** | absolute |
 | Max price | **10× base_value** | absolute |
 
 These values live in `market_params.circuit_breakers` (jsonb).
@@ -308,7 +308,7 @@ Run `scripts/simulate-market.ts` against real fixture data to verify:
 3. **Prospect volatility:** same event → P moves ≤ 18% (lower liquidity, expected)
 4. **Arbitrage resistance:** buying right after seeing a goal on TV (30–60s delay)
    yields < 2% edge after spread — not profitable enough to automate
-5. **Economy not deflationary:** after 100 simulated trades, total FX coins in system
+5. **Economy not deflationary:** after 100 simulated trades, total GC coins in system
    decreases by ≤ 2% (spread is the only sink; should be mild)
 
 ---

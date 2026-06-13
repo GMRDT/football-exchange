@@ -17,9 +17,17 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: 'Football Exchange',
+  metadataBase: new URL('https://golcap.io'),
+  title: 'Golcap',
   description: 'Trade virtual football player shares. World Cup 2026.',
   manifest: '/manifest.json',
+  openGraph: {
+    title: 'Golcap',
+    description: 'Trade virtual football player shares. World Cup 2026.',
+    url: 'https://golcap.io',
+    siteName: 'Golcap',
+    type: 'website',
+  },
 }
 
 export const viewport: Viewport = {

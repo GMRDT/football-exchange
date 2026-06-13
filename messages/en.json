@@ -1,12 +1,16 @@
 {
   "common": {
-    "appName": "Football Exchange",
+    "appName": "Golcap",
     "tagline": "Trade the World Cup. Build your portfolio.",
     "loading": "Loading...",
     "error": "Something went wrong",
     "save": "Save",
     "cancel": "Cancel",
     "close": "Close"
+  },
+  "currency": {
+    "ticker": "GC",
+    "name": "Golcap Coins"
   },
   "nav": {
     "market": "Market",
@@ -32,7 +36,7 @@
     "hasAccount": "Already have an account?",
     "loginLink": "Sign in",
     "checkEmailTitle": "Check your email",
-    "checkEmailBody": "We sent a confirmation link to {email}. Click it to activate your account and get 100,000 FX Coins.",
+    "checkEmailBody": "We sent a confirmation link to {email}. Click it to activate your account and get 100,000 {currencyName}.",
     "errorInvalidCredentials": "Incorrect email or password.",
     "errorGeneric": "Something went wrong. Please try again.",
     "errorInvalidUsername": "Username must be 3–20 characters: letters, numbers, underscores only."
@@ -52,7 +56,7 @@
     "noResults": "No players match your search.",
     "sortChange": "% today",
     "sortPrice": "Price",
-    "coins": "{amount} FX",
+    "coins": "{amount} {ticker}",
     "estimatedCost": "Estimated cost",
     "estimatedProceeds": "Estimated proceeds",
     "fee": "Fee",
@@ -70,7 +74,7 @@
     "yellowCards": "Yellow",
     "redCards": "Red",
     "signupCtaTitle": "Want to trade this player?",
-    "signupCtaBody": "Create your free account and get 100,000 FX Coins to build your portfolio.",
+    "signupCtaBody": "Create your free account and get 100,000 {currencyName} to build your portfolio.",
     "signupCtaButton": "Sign up free"
   },
   "landing": {
@@ -80,7 +84,7 @@
     "seeMarket": "See the market",
     "topMovers": "Top movers now",
     "howItWorks": "How it works",
-    "step1Title": "100,000 FX Coins for you",
+    "step1Title": "100,000 {currencyName} for you",
     "step1Body": "Virtual coins, not real money. Buy and sell anytime.",
     "step2Title": "The pitch moves the prices",
     "step2Body": "Goals, cards and eliminations move value. So do buyers and sellers.",

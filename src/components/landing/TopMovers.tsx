@@ -18,6 +18,7 @@ import { formatCoins } from '@/lib/format'
 export function TopMovers({ initialPlayers }: { initialPlayers: MarketPlayer[] }) {
   const t = useTranslations('landing')
   const tMarket = useTranslations('market')
+  const ticker = useTranslations('currency')('ticker')
   const locale = useLocale()
 
   const { data } = useSWR(marketKey(), fetchMarket, {
@@ -56,7 +57,7 @@ export function TopMovers({ initialPlayers }: { initialPlayers: MarketPlayer[] }
               {p.full_name}
             </span>
             <span className="text-[15px] font-semibold text-text tabular-nums">
-              {tMarket('coins', { amount: formatCoins(p.current_price, locale) })}
+              {tMarket('coins', { amount: formatCoins(p.current_price, locale), ticker })}
             </span>
             <PriceChange pct={p.daily_change_pct} />
           </Link>
