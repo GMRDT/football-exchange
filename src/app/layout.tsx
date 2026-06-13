@@ -30,6 +30,12 @@ export const metadata: Metadata = {
   },
 }
 
+// The app is request-dynamic by nature: locale comes from a cookie (src/i18n/request.ts
+// reads cookies()/headers()) and auth is per-request. Forcing dynamic also keeps Next from
+// statically prerendering client pages at build — the phase where the @serwist/next webpack
+// plugin corrupts the server module graph on Next 15.5 (TypeError: a[d] is not a function).
+export const dynamic = 'force-dynamic'
+
 export const viewport: Viewport = {
   themeColor: '#FAFAF9',
   width: 'device-width',
