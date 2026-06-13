@@ -18,7 +18,8 @@
     "map-api-players": "tsx scripts/map-api-players.ts",
     "record-fixture": "tsx scripts/record-fixture.ts",
     "record-fixtures": "tsx scripts/record-fixtures.ts",
-    "trigger-fn": "tsx scripts/trigger-edge-function.ts"
+    "trigger-fn": "tsx scripts/trigger-edge-function.ts",
+    "e2e:portfolio": "tsx scripts/e2e-portfolio.ts"
   },
   "dependencies": {
     "@serwist/next": "10.0.0-preview.14",
