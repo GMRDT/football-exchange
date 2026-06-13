@@ -11,6 +11,7 @@ type Stage = 'form' | 'check-email'
 
 export default function SignupPage() {
   const t = useTranslations('auth')
+  const currencyName = useTranslations('currency')('name')
 
   const [stage, setStage] = useState<Stage>('form')
   const [email, setEmail] = useState('')
@@ -63,7 +64,7 @@ export default function SignupPage() {
             {t('checkEmailTitle')}
           </h1>
           <p className="text-[15px] text-text-muted leading-6">
-            {t('checkEmailBody', { email })}
+            {t('checkEmailBody', { email, currencyName })}
           </p>
         </div>
       </div>

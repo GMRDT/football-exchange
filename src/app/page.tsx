@@ -16,9 +16,10 @@ export default async function LandingPage() {
   const t = await getTranslations('landing')
   const tCommon = await getTranslations('common')
   const tAuth = await getTranslations('auth')
+  const tCurrency = await getTranslations('currency')
 
   const steps = [
-    { title: t('step1Title'), body: t('step1Body') },
+    { title: t('step1Title', { currencyName: tCurrency('name') }), body: t('step1Body') },
     { title: t('step2Title'), body: t('step2Body') },
     { title: t('step3Title'), body: t('step3Body') },
   ]

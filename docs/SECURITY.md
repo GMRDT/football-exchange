@@ -1,4 +1,4 @@
-# Football Exchange — Security Checklist (MVP)
+# Golcap — Security Checklist (MVP)
 
 This is the exit gate for F5. Every item must be checked before Jun 28 launch.
 Items marked 🔵 are Phase 2 (real money) — do NOT build for MVP.

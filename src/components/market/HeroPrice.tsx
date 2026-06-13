@@ -12,12 +12,13 @@ import { formatCoins } from '@/lib/format'
  */
 export function HeroPrice({ currentPrice }: { currentPrice: string }) {
   const t = useTranslations('market')
+  const ticker = useTranslations('currency')('ticker')
   const locale = useLocale()
   const animated = useCountAnimation(parseFloat(currentPrice))
 
   return (
     <p className="tnum font-display text-[40px] leading-[44px] font-extrabold text-text">
-      {t('coins', { amount: formatCoins(animated, locale) })}
+      {t('coins', { amount: formatCoins(animated, locale), ticker })}
     </p>
   )
 }

@@ -1,12 +1,16 @@
 {
   "common": {
-    "appName": "Football Exchange",
+    "appName": "Golcap",
     "tagline": "Tradea el Mundial. Construye tu portafolio.",
     "loading": "Cargando...",
     "error": "Algo salió mal",
     "save": "Guardar",
     "cancel": "Cancelar",
     "close": "Cerrar"
+  },
+  "currency": {
+    "ticker": "GC",
+    "name": "Golcap Coins"
   },
   "nav": {
     "market": "Mercado",
@@ -32,7 +36,7 @@
     "hasAccount": "¿Ya tienes cuenta?",
     "loginLink": "Inicia sesión",
     "checkEmailTitle": "Revisa tu correo",
-    "checkEmailBody": "Enviamos un enlace de confirmación a {email}. Haz clic en él para activar tu cuenta y recibir 100.000 FX Coins.",
+    "checkEmailBody": "Enviamos un enlace de confirmación a {email}. Haz clic en él para activar tu cuenta y recibir 100.000 {currencyName}.",
     "errorInvalidCredentials": "Correo o contraseña incorrectos.",
     "errorGeneric": "Algo salió mal. Por favor intenta de nuevo.",
     "errorInvalidUsername": "El nombre de usuario debe tener 3–20 caracteres: solo letras, números y guiones bajos."
@@ -52,7 +56,7 @@
     "noResults": "Ningún jugador coincide con tu búsqueda.",
     "sortChange": "% hoy",
     "sortPrice": "Precio",
-    "coins": "{amount} FX",
+    "coins": "{amount} {ticker}",
     "estimatedCost": "Costo estimado",
     "estimatedProceeds": "Ingreso estimado",
     "fee": "Comisión",
@@ -70,7 +74,7 @@
     "yellowCards": "Amarillas",
     "redCards": "Rojas",
     "signupCtaTitle": "¿Quieres operar con este jugador?",
-    "signupCtaBody": "Crea tu cuenta gratis y recibe 100.000 FX Coins para construir tu portafolio.",
+    "signupCtaBody": "Crea tu cuenta gratis y recibe 100.000 {currencyName} para construir tu portafolio.",
     "signupCtaButton": "Regístrate gratis"
   },
   "landing": {
@@ -80,7 +84,7 @@
     "seeMarket": "Ver el mercado",
     "topMovers": "LO MÁS MOVIDO AHORA",
     "howItWorks": "Cómo funciona",
-    "step1Title": "100.000 FX Coins para ti",
+    "step1Title": "100.000 {currencyName} para ti",
     "step1Body": "Monedas virtuales, no dinero real. Compra y vende cuando quieras.",
     "step2Title": "El campo mueve los precios",
     "step2Body": "Goles, tarjetas y eliminaciones mueven el valor. Compradores y vendedores también.",

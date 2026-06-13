@@ -1,4 +1,4 @@
-# Football Exchange — MVP Build Spec v3.2 · UPDATED (World Cup 2026)
+# Golcap — MVP Build Spec v3.2 · UPDATED (World Cup 2026)
 
 **Platform:** PWA mobile-first (installable, web push) · **Stack:** TypeScript everywhere
 · Next.js + Vercel · Supabase
@@ -79,7 +79,7 @@ Advanced features (fair value chart, detailed stats) behind a tap — *progressi
 disclosure*, to avoid overwhelming.
 Bottom bar: Market / Portfolio / Leaderboard.
 
-1. **Onboarding.** Email/Google auth. Starting virtual balance of 100,000 FX coins. 2 how-it-works cards.
+1. **Onboarding.** Email/Google auth. Starting virtual balance of 100,000 GC coins. 2 how-it-works cards.
 2. **Market.** Screener: avatar, team, price, % daily change; search + filters; **Top Gainers / Top Losers**; sortable.
 3. **Player Detail.** Price + (optional) fair value, tournament stats, next match, **Buy / Sell** with your position visible.
 4. **Portfolio.** Positions, total value, P&L (abs and %), cash, evolution, **Share** button.
@@ -165,7 +165,7 @@ is already designed:
 
 1. **Paid contests with prizes (workhorse):** ~10–15% rake on entry fees.
    DraftKings model (~$12B market) and the friendliest legal framing (skill game).
-2. **Premium subscription ("FX Pro"):** advanced stats, reduced fees, exclusive leagues.
+2. **Premium subscription ("Golcap Pro"):** advanced stats, reduced fees, exclusive leagues.
    Recurring, high margin.
 3. **Trading spread:** >1% and dynamic on volatility. Secondary, always transparent.
 4. *(Scale)* sponsorships, data licensing.

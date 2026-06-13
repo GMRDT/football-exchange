@@ -1,4 +1,4 @@
-# Football Exchange — Architecture
+# Golcap — Architecture
 
 ## What we're building (honest description)
 Four systems, not one app:
