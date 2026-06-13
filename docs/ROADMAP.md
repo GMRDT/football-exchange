@@ -258,11 +258,11 @@ Goal: 5 screens + PWA installation. Starts only after F2 green; F3 running in ba
   - [x] Buy / Sell form (calls `supabase.rpc('trade')`)
   - [x] Error handling for all typed error codes
 
-- [ ] **F4.4** Screen 3: Portfolio
-  - [ ] Positions list (avatar, name, shares, current value, P&L)
-  - [ ] Total portfolio value + cash balance
-  - [ ] % return (basis for leaderboard)
-  - [ ] Share button (screenshot/copy text of portfolio P&L)
+- [x] **F4.4** Screen 3: Portfolio — built 2026-06-13
+  - [x] Positions list (avatar, name, shares, current value, P&L)
+  - [x] Total portfolio value + cash balance
+  - [x] % return (basis for leaderboard) — reads `v_portfolio_value` (same source as `v_leaderboard`)
+  - [x] Share button (Web Share API + clipboard fallback)
 
 - [ ] **F4.5** Screen 4: Leaderboard + Private Leagues
   - [ ] Global leaderboard (% return, rank, username, portfolio value)

@@ -103,7 +103,13 @@
     "cash": "Efectivo",
     "totalValue": "Valor total",
     "return": "Retorno (%)",
-    "share": "Compartir"
+    "share": "Compartir",
+    "empty": "Tu portafolio está vacío",
+    "emptyCta": "Explora el mercado",
+    "players": "Tus jugadores ({count})",
+    "sharesAbbr": "ac",
+    "shareText": "Mi retorno en {appName}: {pct} · {value} {ticker}",
+    "shareCopied": "Copiado al portapapeles"
   },
   "leaderboard": {
     "title": "Clasificación",
