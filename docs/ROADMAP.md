@@ -200,7 +200,7 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
   - [x] Verify: invariants pass after live match (`pnpm check-invariants` clean)
   - [ ] Simulate calibration targets from MARKET_ENGINE.md §7 — NOT done (no `scripts/simulate-market.ts` run yet)
 
-- [ ] **F3.6** Live wiring (engine is built and synthetic-tested; these connect it to reality)
+- [x] **F3.6** Live wiring (engine is built and synthetic-tested; these connect it to reality)
   - [x] `pnpm map-api-players` tool: squads-based name match, top-N by base_value,
         idempotent DB write for unambiguous matches, review CSV for the rest
   - [x] Run `pnpm map-api-players` against the live API + review CSV — **213/213 mapped**
@@ -221,12 +221,10 @@ Overlap with F2 end: F3 starts once F1 schema is stable.
         `market.ts`, `group_exits` idempotency ledger, integration-tested
         (single group + 12-group thirds + idempotency). ⚠ post-merge: backfill
         goals of the 2 already-processed fixtures (see F3-completion-report.md)
-  - [ ] Lineup-based FT events (`clean_sheet_gk/def`, `motm`, `injury_out`) — needs
-        `player_match_appearances` ingestion
-    - ⚠ Blocked on player mapping: 28 top-value players are still unmapped in the local
-      seed (185/213) — see `docs/MAPPING_TODO.md` for per-player resolution context. Full
-      lineup-events validation and complete event coverage need these resolved first.
-      (Prod is reportedly 213/213 — re-verify per `docs/F3_5_REPORT.md` recommendation.)
+  - [x] Lineup-based FT events (`clean_sheet_gk/def`, `motm`, `injury_out`) — implemented
+        2026-06-13: ingest fetches `/fixtures/players` at FT, upserts `player_match_appearances`,
+        fires clean_sheet_* and motm through `ingest_event()` RPC; injury_out derived from
+        subst events with injury comments in main event loop. Idempotent via api_event_key.
 
 ---
 

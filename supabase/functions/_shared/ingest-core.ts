@@ -72,9 +72,10 @@ export function isFinalStatus(status: string): boolean {
 // ── Event mapping ─────────────────────────────────────────────────────────────
 
 /** event_types.code values an API event can map to (MARKET_ENGINE.md §1.4).
- * clean_sheet_* / motm / injury_out need lineup data — deferred FT sub-task.
  * shootout_kick is UNPRICED (default_perf_points = 0): recorded for
- * reconciliation/activity only, never moves fair value or enqueues a drip. */
+ * reconciliation/activity only, never moves fair value or enqueues a drip.
+ * clean_sheet_* / motm are synthetic FT events derived from lineup stats.
+ * injury_out is derived from subst events with injury comments. */
 export type EventCode =
   | 'goal'
   | 'assist'
@@ -84,6 +85,10 @@ export type EventCode =
   | 'penalty_missed'
   | 'own_goal'
   | 'shootout_kick'
+  | 'injury_out'
+  | 'clean_sheet_gk'
+  | 'clean_sheet_def'
+  | 'motm'
 
 export type MappedEvent = {
   code: EventCode
@@ -129,8 +134,13 @@ export function mapApiEvent(ev: ApiEvent): MappedEvent[] {
     } else if (detail === 'red card' || detail === 'second yellow card') {
       if (ev.player.id != null) out.push({ code: 'red_card', apiPlayerId: ev.player.id })
     }
+  } else if (type === 'subst') {
+    // Injury substitution: the player who came OFF (assist field) gets injury_out.
+    if ((ev.comments ?? '').toLowerCase().includes('injury') && ev.assist?.id != null) {
+      out.push({ code: 'injury_out', apiPlayerId: ev.assist.id })
+    }
   }
-  // subst / Var / anything else: no direct price impact in MVP.
+  // Var / anything else: no direct price impact in MVP.
 
   return out
 }
@@ -187,6 +197,105 @@ export function createEventKeyBuilder(
     seen.set(base, n)
     return n === 1 ? base : `${base}#${n}`
   }
+}
+
+// ── Lineup stats (/fixtures/players) ─────────────────────────────────────────
+
+export const ApiPlayerStatsSchema = z.object({
+  player: z.object({ id: z.number() }),
+  statistics: z
+    .array(
+      z.object({
+        games: z.object({
+          minutes: z.number().nullable(),
+          position: z.string().nullable(),
+          rating: z.string().nullable(),
+          substitute: z.boolean(),
+        }),
+      })
+    )
+    .min(1),
+})
+
+export const ApiTeamPlayersSchema = z.object({
+  team: z.object({ id: z.number() }),
+  players: z.array(z.unknown()),
+})
+
+export type ApiTeamPlayers = z.infer<typeof ApiTeamPlayersSchema>
+
+export type FtLineupEvent = {
+  code: 'clean_sheet_gk' | 'clean_sheet_def' | 'motm'
+  apiPlayerId: number
+}
+
+export type AppearanceData = {
+  apiPlayerId: number
+  minutesPlayed: number
+  started: boolean
+}
+
+/**
+ * Derives clean_sheet_gk, clean_sheet_def, and motm from /fixtures/players
+ * stats. Returns synthetic FT events and appearance records for DB storage.
+ *
+ * Clean sheet: position G or D, played 90+ minutes, team conceded 0 goals.
+ * MOTM: highest-rated player across both teams (first if tied).
+ */
+export function computeFtLineupEvents(
+  teamPlayers: ApiTeamPlayers[],
+  homeGoals: number | null,
+  awayGoals: number | null,
+  homeApiTeamId: number | null,
+  awayApiTeamId: number | null
+): { ftEvents: FtLineupEvent[]; appearances: AppearanceData[] } {
+  const ftEvents: FtLineupEvent[] = []
+  const appearances: AppearanceData[] = []
+  let bestRating = -1
+  let motmPlayerId: number | null = null
+
+  for (const teamData of teamPlayers) {
+    const isHome = teamData.team.id === homeApiTeamId
+    const isAway = teamData.team.id === awayApiTeamId
+    if (!isHome && !isAway) continue
+
+    const goalsAgainst = isHome ? (awayGoals ?? null) : (homeGoals ?? null)
+    const cleanSheet = goalsAgainst === 0
+
+    for (const rawPlayer of teamData.players) {
+      const parsed = ApiPlayerStatsSchema.safeParse(rawPlayer)
+      if (!parsed.success) continue
+      const { player, statistics } = parsed.data
+      const stats = statistics[0].games
+      const minutes = stats.minutes ?? 0
+      const position = stats.position ?? ''
+      const started = !stats.substitute
+
+      if (minutes > 0) {
+        appearances.push({ apiPlayerId: player.id, minutesPlayed: minutes, started })
+      }
+
+      if (stats.rating) {
+        const rating = parseFloat(stats.rating)
+        if (!isNaN(rating) && rating > bestRating) {
+          bestRating = rating
+          motmPlayerId = player.id
+        }
+      }
+
+      if (cleanSheet && minutes >= 90) {
+        if (position === 'G') ftEvents.push({ code: 'clean_sheet_gk', apiPlayerId: player.id })
+        else if (position === 'D')
+          ftEvents.push({ code: 'clean_sheet_def', apiPlayerId: player.id })
+      }
+    }
+  }
+
+  if (motmPlayerId !== null) {
+    ftEvents.push({ code: 'motm', apiPlayerId: motmPlayerId })
+  }
+
+  return { ftEvents, appearances }
 }
 
 // ── FT outcome ────────────────────────────────────────────────────────────────

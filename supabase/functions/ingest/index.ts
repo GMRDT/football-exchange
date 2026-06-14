@@ -18,6 +18,8 @@ import {
   ApiEventSchema,
   ApiFixtureResultSchema,
   ApiResponseSchema,
+  ApiTeamPlayersSchema,
+  computeFtLineupEvents,
   createEventKeyBuilder,
   deriveOutcome,
   isFinalStatus,
@@ -221,6 +223,92 @@ Deno.serve(async (req: Request) => {
           }
           break
         }
+      }
+    }
+
+    // ── FT lineup events (clean_sheet_*, motm) and appearances ───────────────
+    // Fetched once per fixture that just reached a final status; idempotent
+    // because ingest_event uses ON CONFLICT DO NOTHING on api_event_key.
+    if (isFinalStatus(status)) {
+      try {
+        const lineupRes = await fetch(
+          `${API_BASE}/fixtures/players?fixture=${match.api_fixture_id}`,
+          { headers: { 'x-apisports-key': API_FOOTBALL_KEY } }
+        )
+        if (lineupRes.ok) {
+          const lineupBody = ApiResponseSchema.safeParse(await lineupRes.json())
+          if (lineupBody.success && lineupBody.data.response.length > 0) {
+            const teamPlayers = lineupBody.data.response
+              .map((r) => ApiTeamPlayersSchema.safeParse(r))
+              .filter((r) => r.success)
+              .map((r) => r.data!)
+
+            const { ftEvents, appearances } = computeFtLineupEvents(
+              teamPlayers,
+              match.home_goals,
+              match.away_goals,
+              match.home_api_team_id,
+              match.away_api_team_id
+            )
+
+            // Upsert appearance records for the full squad.
+            const appearanceRows = appearances
+              .map((a) => {
+                const player = playerByApiId.get(a.apiPlayerId)
+                if (!player) return null
+                return {
+                  match_id: match.id,
+                  player_id: player.id,
+                  minutes_played: a.minutesPlayed,
+                  started: a.started,
+                }
+              })
+              .filter((r): r is NonNullable<typeof r> => r !== null)
+            if (appearanceRows.length > 0) {
+              const { error } = await supabase
+                .from('player_match_appearances')
+                .upsert(appearanceRows, { onConflict: 'match_id,player_id' })
+              if (error)
+                summary.errors.push(`appearances ${match.api_fixture_id}: ${error.message}`)
+            }
+
+            // Fire clean_sheet_* and motm through the standard pricing pipeline.
+            for (const ftEv of ftEvents) {
+              const player = playerByApiId.get(ftEv.apiPlayerId)
+              if (!player) continue
+              const eventType = eventTypeByCode.get(ftEv.code)
+              if (!eventType) continue
+              const fv = fairValueById.get(player.id)
+              if (!fv) continue
+              const key = `${match.api_fixture_id}:ft:${ftEv.code}:${ftEv.apiPlayerId}`
+              const newFv = applyEventToFairValue(fv, eventType.perf_points, RECENCY_C)
+              const totalPct = eventDeltaPct(eventType.perf_points, RECENCY_C)
+
+              const { data, error } = await supabase.rpc('ingest_event', {
+                p_match_id: match.id,
+                p_player_id: player.id,
+                p_event_type_id: eventType.id,
+                p_minute: 90,
+                p_api_event_key: key,
+                p_expected_fair_value: fv,
+                p_new_fair_value: newFv.toFixed(6),
+                p_total_pct: totalPct.toFixed(6),
+              })
+              if (error) {
+                summary.errors.push(`ingest_event ${key}: ${error.message}`)
+              } else if ((data as { inserted: boolean }).inserted) {
+                summary.events_inserted++
+                fairValueById.set(player.id, newFv.toFixed(6))
+              }
+            }
+          }
+        } else {
+          summary.errors.push(
+            `lineup fetch ${match.api_fixture_id}: HTTP ${lineupRes.status}`
+          )
+        }
+      } catch (err) {
+        summary.errors.push(`lineup ${match.api_fixture_id}: ${String(err)}`)
       }
     }
 
