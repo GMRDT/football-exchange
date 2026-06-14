@@ -56,6 +56,12 @@
     "noResults": "No players match your search.",
     "sortChange": "% today",
     "sortPrice": "Price",
+    "sortValue": "Value",
+    "all": "All",
+    "position": "Position",
+    "country": "Country",
+    "searchCountry": "Search country...",
+    "results": "{count} players",
     "coins": "{amount} {ticker}",
     "estimatedCost": "Estimated cost",
     "estimatedProceeds": "Estimated proceeds",
@@ -78,6 +84,7 @@
     "signupCtaButton": "Sign up free"
   },
   "landing": {
+    "eyebrow": "World Cup 2026 · Free to play",
     "headline": "The World Cup 2026 player market",
     "tagline": "Buy and sell the stars with 100,000 fully virtual coins. Prices move with the matches in real time.",
     "startFree": "Start free",

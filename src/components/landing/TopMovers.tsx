@@ -41,10 +41,17 @@ export function TopMovers({ initialPlayers }: { initialPlayers: MarketPlayer[] }
   if (movers.length === 0) return null
 
   return (
-    <section className="rounded-2xl border border-border bg-surface p-4">
-      <h2 className="text-[13px] leading-4 font-semibold tracking-wide text-text-muted uppercase">
-        {t('topMovers')}
-      </h2>
+    <section className="rounded-2xl border border-border bg-surface p-4 shadow-sm shadow-black/[0.03] lg:p-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-[13px] leading-4 font-semibold tracking-wide text-text-muted uppercase">
+          {t('topMovers')}
+        </h2>
+        {/* Live indicator — brand accent, not a price color (DESIGN §2 golden rule) */}
+        <span aria-hidden="true" className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+        </span>
+      </div>
       <div className="mt-2 divide-y divide-border">
         {movers.map((p) => (
           <Link

@@ -71,3 +71,27 @@ export async function getMarketSummary(
     daily_change_pct: dailyChangePct(row.current_price, row.price_24h_ago),
   }))
 }
+
+// ── Teams (for the market's group/country browse — DESIGN.md "football heart") ──
+// Static reference data (48 rows): fetched once server-side and passed to the
+// Market screen, not polled. `country` is an ISO-3166 alpha-2 code (UK nations use
+// FIFA codes like SCT/ENG); `group_name` is the World Cup group letter (A–L).
+const teamRowSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  country: z.string().nullable(),
+  group_name: z.string().nullable(),
+  is_eliminated: z.boolean(),
+})
+
+export type MarketTeam = z.infer<typeof teamRowSchema>
+
+/** Anon-readable reference list (teams RLS is public). */
+export async function getTeams(supabase: SupabaseClient<Database>): Promise<MarketTeam[]> {
+  const { data, error } = await supabase
+    .from('teams')
+    .select('id, name, country, group_name, is_eliminated')
+    .order('group_name', { ascending: true })
+  if (error) throw new Error(`teams failed: ${error.message}`)
+  return z.array(teamRowSchema).parse(data ?? [])
+}

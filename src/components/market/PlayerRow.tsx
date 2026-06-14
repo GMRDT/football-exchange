@@ -9,15 +9,16 @@ import { formatCoins } from '@/lib/format'
 import type { MarketPlayer } from '@/lib/market/summary'
 
 /**
- * PlayerRow — the PlayerCard atom (DESIGN.md §4) as a market list row.
+ * PlayerRow — the PlayerCard atom (DESIGN.md §4) as a market list row, with an
+ * optional rank number (gamified browse) and a 🔥 tag for strong gainers.
  *
  * `index` drives the entrance-stagger animation on first mount (DESIGN.md §4c).
- * When undefined (SWR poll re-renders), no animation fires — the element is
- * already visible and CSS animations don't restart without an unmount/remount.
- *
- * Price flash (DESIGN.md §4a): when SWR returns a changed price, the right
- * cell background flashes 400ms in the semantic direction color.
+ * When undefined (SWR poll re-renders), no animation fires. Price flash (§4a):
+ * when SWR returns a changed price, the right cell flashes 400ms in the
+ * semantic direction color.
  */
+
+const HOT_THRESHOLD = 5 // % daily change above which a row earns the 🔥 tag
 
 function usePriceFlash(price: string): 'up' | 'down' | null {
   const prev = useRef(price)
@@ -38,17 +39,19 @@ function usePriceFlash(price: string): 'up' | 'down' | null {
 export function PlayerRow({
   player,
   index,
+  rank,
 }: {
   player: MarketPlayer
   index?: number
+  rank?: number
 }) {
   const locale = useLocale()
   const tPositions = useTranslations('positions')
   const flash = usePriceFlash(player.current_price)
 
-  // Entrance animation fires on mount via CSS; stagger capped at 15 rows.
   const hasEntrance = index !== undefined
   const entranceDelay = hasEntrance ? `${Math.min(index, 15) * 25}ms` : undefined
+  const hot = player.daily_change_pct >= HOT_THRESHOLD
 
   const flashClass =
     flash === 'up'
@@ -60,14 +63,27 @@ export function PlayerRow({
   return (
     <Link
       href={`/market/${player.id}`}
-      className={`flex min-h-[56px] items-center gap-3 border-b border-border bg-surface px-4 py-2 transition active:bg-bg ${hasEntrance ? 'animate-row-entrance' : ''}`}
+      className={`group flex min-h-[60px] items-center gap-3 border-b border-border bg-surface px-4 py-2.5 transition hover:bg-bg active:bg-bg ${hasEntrance ? 'animate-row-entrance' : ''}`}
       style={entranceDelay ? { animationDelay: entranceDelay } : undefined}
     >
+      {rank !== undefined && (
+        <span className="w-5 shrink-0 text-center text-[13px] font-semibold text-text-muted tabular-nums">
+          {rank}
+        </span>
+      )}
+
       <KitAvatar colors={player.avatar_colors} fullName={player.full_name} size="sm" />
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[16px] leading-6 font-semibold text-text">
-          {player.full_name}
+        <span className="flex items-center gap-1.5">
+          <span className="truncate text-[16px] leading-6 font-semibold text-text">
+            {player.full_name}
+          </span>
+          {hot && (
+            <span aria-hidden="true" className="shrink-0 text-[13px]" title="Hot">
+              🔥
+            </span>
+          )}
         </span>
         <span className="block truncate text-[13px] leading-4 text-text-muted">
           {player.team_name} · {tPositions(player.position_code)}

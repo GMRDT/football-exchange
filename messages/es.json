@@ -56,6 +56,12 @@
     "noResults": "Ningún jugador coincide con tu búsqueda.",
     "sortChange": "% hoy",
     "sortPrice": "Precio",
+    "sortValue": "Valor",
+    "all": "Todos",
+    "position": "Posición",
+    "country": "País",
+    "searchCountry": "Buscar país...",
+    "results": "{count} jugadores",
     "coins": "{amount} {ticker}",
     "estimatedCost": "Costo estimado",
     "estimatedProceeds": "Ingreso estimado",
@@ -78,6 +84,7 @@
     "signupCtaButton": "Regístrate gratis"
   },
   "landing": {
+    "eyebrow": "Mundial 2026 · Gratis",
     "headline": "El mercado de jugadores del Mundial 2026",
     "tagline": "Compra y vende las estrellas con 100.000 monedas virtuales. Los precios viven los partidos en tiempo real.",
     "startFree": "Empezar gratis",

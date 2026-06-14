@@ -27,7 +27,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 select-none border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-40 select-none border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       <div className="relative mx-auto flex h-14 max-w-lg items-stretch">
         {/* Sliding top-line indicator (DESIGN.md §4f) */}
