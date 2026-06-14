@@ -57,7 +57,7 @@ export function TopMovers({ initialPlayers }: { initialPlayers: MarketPlayer[] }
           <Link
             key={p.id}
             href={`/market/${p.id}`}
-            className="flex min-h-[56px] items-center gap-3 py-2 transition active:bg-bg"
+            className="-mx-2 flex min-h-[56px] items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-bg active:bg-bg"
           >
             <KitAvatar colors={p.avatar_colors} fullName={p.full_name} size="sm" />
             <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-text">

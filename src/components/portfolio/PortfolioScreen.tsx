@@ -10,6 +10,8 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { formatCoins } from '@/lib/format'
 import { portfolioKey } from '@/lib/swr/keys'
 import { fetchPortfolio, type PortfolioResponse } from '@/lib/portfolio/summary'
+import { useCountAnimation } from '@/hooks/useCountAnimation'
+import { Reveal } from '@/components/ui/Reveal'
 
 /**
  * PortfolioScreen — authed Portfolio (DESIGN.md §10). Server hands the initial
@@ -30,6 +32,9 @@ export function PortfolioScreen({ initial }: { initial: PortfolioResponse }) {
     keepPreviousData: true,
   })
   const { positions, total_value, cash_balance, return_pct } = data ?? initial
+  // Hero count animation (DESIGN.md §6.2): the total smooths over 300ms when a
+  // poll/trade changes it. First mount snaps (from === target), so no 0→value flash.
+  const animatedTotal = useCountAnimation(total_value)
 
   const [copied, setCopied] = useState(false)
 
@@ -76,7 +81,9 @@ export function PortfolioScreen({ initial }: { initial: PortfolioResponse }) {
   return (
     <main className="mx-auto max-w-lg">
       <header className="px-4 pt-6 pb-3">
-        <h1 className="font-display text-[28px] leading-8 font-bold text-text">{t('title')}</h1>
+        <Reveal>
+          <h1 className="font-display text-[28px] leading-8 font-bold text-text">{t('title')}</h1>
+        </Reveal>
       </header>
 
       {positions.length === 0 ? (
@@ -84,33 +91,35 @@ export function PortfolioScreen({ initial }: { initial: PortfolioResponse }) {
       ) : (
         <>
           {/* Aggregate (DESIGN §10) */}
-          <section className="px-4 pb-4">
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <p className="font-display text-[32px] leading-9 font-extrabold text-text tabular-nums">
-                  {coins(total_value)}
+          <Reveal>
+            <section className="px-4 pb-4">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <p className="font-display text-[32px] leading-9 font-extrabold text-text tabular-nums">
+                    {coins(animatedTotal)}
+                  </p>
+                  <p className="mt-0.5 text-[13px] text-text-muted">{t('totalValue')}</p>
+                </div>
+                <div className="flex flex-col items-end gap-0.5">
+                  <PriceChange pct={return_pct} />
+                  <p className="text-[13px] text-text-muted">{t('return')}</p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <p className="text-[15px] text-text-muted tabular-nums">
+                  {t('cash')}: {coins(cash_balance)}
                 </p>
-                <p className="mt-0.5 text-[13px] text-text-muted">{t('totalValue')}</p>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl border border-border bg-surface px-4 text-[15px] font-semibold text-text transition active:scale-[0.98] active:bg-bg"
+                >
+                  {t('share')}
+                  <span aria-hidden="true">📤</span>
+                </button>
               </div>
-              <div className="flex flex-col items-end gap-0.5">
-                <PriceChange pct={return_pct} />
-                <p className="text-[13px] text-text-muted">{t('return')}</p>
-              </div>
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-3">
-              <p className="text-[15px] text-text-muted tabular-nums">
-                {t('cash')}: {coins(cash_balance)}
-              </p>
-              <button
-                type="button"
-                onClick={handleShare}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl border border-border bg-surface px-4 text-[15px] font-semibold text-text transition active:scale-[0.98] active:bg-bg"
-              >
-                {t('share')}
-                <span aria-hidden="true">📤</span>
-              </button>
-            </div>
-          </section>
+            </section>
+          </Reveal>
 
           {/* Positions */}
           <section className="border-t border-border">
@@ -118,11 +127,12 @@ export function PortfolioScreen({ initial }: { initial: PortfolioResponse }) {
               {t('players', { count: positions.length })}
             </h2>
             <div>
-              {positions.map((p) => (
+              {positions.map((p, i) => (
                 <Link
                   key={p.player_id}
                   href={`/market/${p.player_id}`}
-                  className="flex min-h-[56px] items-center gap-3 px-4 py-2 transition active:bg-bg"
+                  className="flex min-h-[56px] animate-row-entrance items-center gap-3 px-4 py-2 transition hover:bg-bg active:bg-bg"
+                  style={{ animationDelay: `${Math.min(i, 12) * 25}ms` }}
                 >
                   <KitAvatar colors={p.avatar_colors} fullName={p.full_name} size="md" />
                   <div className="min-w-0 flex-1">

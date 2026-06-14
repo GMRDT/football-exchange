@@ -3,7 +3,7 @@
 **Launch:** Jun 28, 2026 (World Cup Round of 16, Day 1)
 **Hard deadline:** 18 days from Jun 10
 **Operator:** solo founder
-**Last updated:** 2026-06-12
+**Last updated:** 2026-06-13
 
 > Update checkboxes as tasks complete. This file is the daily status board.
 
@@ -17,10 +17,10 @@ Goal: working repo, tooling, CI, and 6 docs. Nothing else.
 - [ ] **F0.1** Accounts & access
   - [x] GitHub repo created (`football-exchange`, private) — remote `GMRDT/football-exchange`
   - [x] Supabase project created (region: closest to Colombia → us-east-1 or us-west-2)
-  - [ ] Vercel project linked to GitHub repo (unverified — no evidence in repo)
+  - [x] Vercel project linked to GitHub repo — auto-deploy on push to main (verified 2026-06-13)
   - [x] API-Football paid plan activated (Pro, active until Jul 12 — verified 2026-06-12)
   - [x] Cloudflare Turnstile site registered (site + secret keys present in env)
-  - [ ] All secrets saved to password manager + Vercel env vars + Supabase secrets (unverified)
+  - [x] All secrets saved to Vercel env vars (SUPABASE_URL, anon key, service role, API_FOOTBALL_KEY) — verified 2026-06-13
 
 - [x] **F0.2** Local environment
   - [x] Node LTS (v22+) installed
@@ -268,6 +268,10 @@ Goal: 5 screens + PWA installation. Starts only after F2 green; F3 running in ba
   - [x] Global leaderboard (% return, rank, username, portfolio value) — built 2026-06-13.
         Public `/leaderboard` reads `v_leaderboard` (matview, ranks on `return_pct`, ADR-007);
         signed-in user's row is highlighted / pinned. E2E: `pnpm e2e:leaderboard`.
+        Verified ready-for-prod 2026-06-13: typecheck/lint/test (70) / build green;
+        E2E 15/15 + `check-invariants` clean; migrations `…0009` (matview) and `…0003`
+        (cron) applied on remote; `pnpm check-prod-secrets` green against prod —
+        `refresh-leaderboard` active, `last_run=succeeded`. No code changes (pure verify).
   - [ ] Create private league (generates invite code) — deferred (needs write RPC + RLS, own PR)
   - [ ] Join private league (enter invite code) — deferred
   - [ ] League leaderboard — deferred
