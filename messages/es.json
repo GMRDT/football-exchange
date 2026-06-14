@@ -96,7 +96,20 @@
     "step2Title": "El campo mueve los precios",
     "step2Body": "Goles, tarjetas y eliminaciones mueven el valor. Compradores y vendedores también.",
     "step3Title": "Sube en la clasificación",
-    "step3Body": "Gana por retorno porcentual, no por llegar primero."
+    "step3Body": "Gana por retorno porcentual, no por llegar primero.",
+    "featuresEyebrow": "Por qué engancha",
+    "featuresHeadline": "Un mercado que se mueve como el partido",
+    "feature1Title": "Los precios viven el partido",
+    "feature1Body": "Goles, tarjetas y cambios mueven los precios en tiempo real durante cada partido.",
+    "feature2Title": "100.000 monedas de regalo",
+    "feature2Body": "Empieza a operar en cuanto te registras. Sin depósito, sin tarjeta — todo es virtual.",
+    "feature3Title": "Sube en la clasificación global",
+    "feature3Body": "Compite por retorno porcentual y mira subir tu puesto con cada buena jugada.",
+    "trustVirtual": "Dinero 100% virtual",
+    "trustFree": "Gratis — sin tarjeta",
+    "trustLive": "Precios en vivo todo el torneo",
+    "closingTitle": "¿Listo para armar tu portafolio?",
+    "closingBody": "Regístrate gratis y recibe 100.000 {currencyName} para operar el Mundial."
   },
   "positions": {
     "GK": "POR",

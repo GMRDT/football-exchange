@@ -96,7 +96,20 @@
     "step2Title": "The pitch moves the prices",
     "step2Body": "Goals, cards and eliminations move value. So do buyers and sellers.",
     "step3Title": "Climb the leaderboard",
-    "step3Body": "Win by percentage return, not by finishing first."
+    "step3Body": "Win by percentage return, not by finishing first.",
+    "featuresEyebrow": "Why it's fun",
+    "featuresHeadline": "A market that moves like the match",
+    "feature1Title": "Prices live the match",
+    "feature1Body": "Goals, cards and subs move prices in real time during every game.",
+    "feature2Title": "100,000 coins on us",
+    "feature2Body": "Start trading the moment you sign up. No deposit, no card — it's all virtual.",
+    "feature3Title": "Climb the global leaderboard",
+    "feature3Body": "Compete on percentage return and watch your rank rise with every smart call.",
+    "trustVirtual": "100% virtual money",
+    "trustFree": "Free — no card needed",
+    "trustLive": "Live prices all tournament",
+    "closingTitle": "Ready to build your portfolio?",
+    "closingBody": "Sign up free and get 100,000 {currencyName} to trade the World Cup."
   },
   "positions": {
     "GK": "GK",

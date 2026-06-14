@@ -25,6 +25,9 @@
   --duration-fast: 150ms;
   --duration-base: 200ms;
   --duration-slow: 250ms;
+  /* Scroll-reveal runs longer than micro-interactions by design — a calm,
+     premium section entrance (Robinhood-style), not a snappy UI response. */
+  --duration-reveal: 600ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 
   /* ── Animation shorthands → Tailwind animate-* utilities ──────────────  */
@@ -82,6 +85,31 @@
   /* Tabular-nums shorthand (DESIGN.md §3) */
   .tnum {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Scroll-reveal — sections start hidden + nudged down, then ease into place
+     when scrolled into view (the `is-visible` class is added by <Reveal>, the
+     IntersectionObserver wrapper). Stagger via inline transition-delay.
+     Safety: prefers-reduced-motion (below) and the <noscript> block in the root
+     layout both force the visible state, so content is never hidden without JS. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity var(--duration-reveal) var(--ease-standard),
+      transform var(--duration-reveal) var(--ease-standard);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 }
 

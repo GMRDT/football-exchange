@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { marketKey } from '@/lib/swr/keys'
 import { fetchMarket, type MarketPlayer, type MarketTeam } from '@/lib/market/summary'
 import { formatCoins } from '@/lib/format'
+import { Reveal } from '@/components/ui/Reveal'
 
 /**
  * MarketScreen — "browse by football" (DESIGN.md §8). Position + World Cup group
@@ -122,16 +123,18 @@ export function MarketScreen({
   return (
     <main className="mx-auto max-w-lg pb-10 lg:max-w-5xl lg:px-6">
       <header className="px-4 pt-6 pb-3 lg:px-0 lg:pt-8">
-        <h1 className="font-display text-[28px] leading-8 font-bold text-text lg:text-[34px] lg:leading-10">
-          {t('title')}
-        </h1>
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('search')}
-          className="mt-3 h-11 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-text placeholder:text-text-muted outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 lg:max-w-xl"
-        />
+        <Reveal>
+          <h1 className="font-display text-[28px] leading-8 font-bold text-text lg:text-[34px] lg:leading-10">
+            {t('title')}
+          </h1>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('search')}
+            className="mt-3 h-11 w-full rounded-xl border border-border bg-surface px-4 text-[15px] text-text placeholder:text-text-muted outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 lg:max-w-xl"
+          />
+        </Reveal>
       </header>
 
       {/* Browse filters: position + World Cup group */}
@@ -166,8 +169,10 @@ export function MarketScreen({
         <aside
           className={`lg:col-start-2 lg:row-start-1 lg:sticky lg:top-24 ${filtering ? 'hidden lg:block' : ''}`}
         >
-          <MoverSection emoji="🔥" label={t('topGainers')} movers={gainers} />
-          <MoverSection emoji="🧊" label={t('topLosers')} movers={losers} />
+          <Reveal delay={80}>
+            <MoverSection emoji="🔥" label={t('topGainers')} movers={gainers} />
+            <MoverSection emoji="🧊" label={t('topLosers')} movers={losers} />
+          </Reveal>
         </aside>
 
         <section className="lg:col-start-1 lg:row-start-1">
@@ -375,7 +380,7 @@ function MoverSection({
           <Link
             key={p.id}
             href={`/market/${p.id}`}
-            className="flex w-[150px] shrink-0 flex-col gap-2.5 rounded-2xl border border-border bg-surface p-3 transition hover:border-text-muted active:bg-bg lg:w-auto lg:shrink lg:flex-row lg:items-center lg:gap-2.5"
+            className="flex w-[150px] shrink-0 flex-col gap-2.5 rounded-2xl border border-border bg-surface p-3 transition hover:-translate-y-0.5 hover:border-text-muted hover:shadow-sm hover:shadow-black/[0.04] active:translate-y-0 active:bg-bg lg:w-auto lg:shrink lg:flex-row lg:items-center lg:gap-2.5"
           >
             <div className="flex min-w-0 items-center gap-2 lg:flex-1">
               <KitAvatar colors={p.avatar_colors} fullName={p.full_name} size="sm" />

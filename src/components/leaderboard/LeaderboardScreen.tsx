@@ -4,6 +4,7 @@ import useSWR from 'swr'
 import { useLocale, useTranslations } from 'next-intl'
 import { PriceChange } from '@/components/ui/PriceChange'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Reveal } from '@/components/ui/Reveal'
 import { formatCoins } from '@/lib/format'
 import { leaderboardKey } from '@/lib/swr/keys'
 import {
@@ -31,6 +32,7 @@ function LeaderboardRow({
   valueLabel,
   isCurrentUser,
   youLabel,
+  index,
 }: {
   rankLabel: string
   username: string
@@ -38,9 +40,13 @@ function LeaderboardRow({
   valueLabel: string
   isCurrentUser: boolean
   youLabel: string
+  index?: number
 }) {
   return (
-    <div className={`flex min-h-[56px] items-center gap-3 px-4 py-2 ${isCurrentUser ? 'bg-surface' : ''}`}>
+    <div
+      className={`flex min-h-[56px] items-center gap-3 px-4 py-2 ${index !== undefined ? 'animate-row-entrance' : ''} ${isCurrentUser ? 'bg-primary/[0.06] ring-1 ring-inset ring-primary/15' : ''}`}
+      style={index !== undefined ? { animationDelay: `${Math.min(index, 12) * 25}ms` } : undefined}
+    >
       <span className="w-8 shrink-0 text-center text-[15px] font-semibold text-text-muted tabular-nums">
         {rankLabel}
       </span>
@@ -76,7 +82,7 @@ export function LeaderboardScreen({ initial }: { initial: LeaderboardResponse })
   const coins = (n: number) => tMarket('coins', { amount: formatCoins(n, locale), ticker })
   const youLabel = t('you')
 
-  const row = (entry: LeaderboardEntry, isCurrentUser: boolean) => (
+  const row = (entry: LeaderboardEntry, isCurrentUser: boolean, index?: number) => (
     <LeaderboardRow
       key={entry.user_id}
       rankLabel={medal(entry.rank)}
@@ -85,13 +91,16 @@ export function LeaderboardScreen({ initial }: { initial: LeaderboardResponse })
       valueLabel={coins(entry.total_value)}
       isCurrentUser={isCurrentUser}
       youLabel={youLabel}
+      index={index}
     />
   )
 
   return (
     <main className="mx-auto max-w-lg">
       <header className="px-4 pt-6 pb-3">
-        <h1 className="font-display text-[28px] leading-8 font-bold text-text">{t('title')}</h1>
+        <Reveal>
+          <h1 className="font-display text-[28px] leading-8 font-bold text-text">{t('title')}</h1>
+        </Reveal>
       </header>
 
       {entries.length === 0 ? (
@@ -105,7 +114,9 @@ export function LeaderboardScreen({ initial }: { initial: LeaderboardResponse })
             <span>{t('return')}</span>
           </div>
 
-          <section>{entries.map((entry) => row(entry, entry.user_id === currentUserId))}</section>
+          <section>
+            {entries.map((entry, i) => row(entry, entry.user_id === currentUserId, i))}
+          </section>
 
           {/* Signed-in user outside the top N — pin their row so they always see their standing. */}
           {currentUserEntry && (

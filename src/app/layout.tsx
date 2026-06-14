@@ -49,6 +49,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale}>
       <body className={`${inter.variable} ${manrope.variable}`}>
+        {/* No-JS safety: scroll-reveal sections default to hidden (globals.css
+            .reveal); without JS the IntersectionObserver never runs, so force
+            them visible. prefers-reduced-motion is handled in CSS separately. */}
+        <noscript>
+          <style dangerouslySetInnerHTML={{ __html: '.reveal{opacity:1!important;transform:none!important}' }} />
+        </noscript>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
         </NextIntlClientProvider>
